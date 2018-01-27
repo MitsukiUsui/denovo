@@ -87,19 +87,20 @@ def get_synteny_df(cluster_df, orf2synteny, strain_lst):
         try:
             dct["neighbor"], dct["synteny"]=calc_synteny(neighbor_lst)
         except:
-            print("ERROR: {}".format(row["family"]))
+            print("\tWARN: fail to calcurate synteny score for {} ".format(row["family"])) #probably because this family has no neighbor
         dct_lst.append(dct)
     syn_df = pd.DataFrame(dct_lst)
     syn_df=syn_df[["family", "left_per", "right_per", "synteny", "left", "right", "neighbor"]]
     return syn_df
     
 
-def main(strainFilepath, clusterFilepath, outFilepath):
+def main(target, strainFilepath, clusterFilepath, outFilepath):
     strain_lst=[s.strip() for s in open(strainFilepath, 'r').readlines()]
     cluster_df=pd.read_csv(clusterFilepath, delimiter="\t")
     
-    gffDirec="/data/mitsuki/data/ortho/bacillus/gff"
-    print("START: gether synteny information for {} strains".format(len(strain_lst)))
+    annotationType="prodigal"
+    gffDirec="/data/mitsuki/data/denovo/{}/annotation/{}/gff".format(target, annotationType)
+    print("START: gather synteny information for {} strains".format(len(strain_lst)))
     orf2synteny=get_orf2synteny(strain_lst, gffDirec)
     print("START: calculate synteny score for {} families".format(cluster_df.shape[0]))
     syn_df = get_synteny_df(cluster_df, orf2synteny, strain_lst)
@@ -107,8 +108,8 @@ def main(strainFilepath, clusterFilepath, outFilepath):
     print("DONE: output to {}".format(outFilepath))
 
 if __name__=="__main__":
-    target="bacillus"
+    target=sys.argv[1]
     strainFilepath="../data/{}/strain.lst".format(target)
     clusterFilepath="../data/{}/cluster.tsv".format(target)
     outFilepath = "../data/{}/synteny.tsv".format(target)
-    main(strainFilepath, clusterFilepath, outFilepath)
+    main(target, strainFilepath, clusterFilepath, outFilepath)

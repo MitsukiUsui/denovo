@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
-sys.path.append("/home/mitsuki/altorf/mbgd/helper")
+sys.path.append("../..//helper")
 from myutil.myutil import myrun
 
 target=sys.argv[1]

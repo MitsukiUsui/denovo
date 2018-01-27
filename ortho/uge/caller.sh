@@ -1,7 +1,7 @@
 #!/bin/bash
 #$ -S /bin/bash
-#$ -N blastn 
-#$ -q standard.q
+#$ -N refseq
+#$ -q all.q
 #$ -cwd
 #$ -v PATH
 #$ -o ./log/$JOB_ID.out
@@ -9,5 +9,4 @@
 #$ -l mem_free=5G
 
 cd ../
-time ./blastn.sh ${1} ${2}
-time ./summarize_blastn.py ${1} ${2}
+time ./format_refseq.py ${1} ${2} ${3}

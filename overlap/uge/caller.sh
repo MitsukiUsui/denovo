@@ -1,7 +1,7 @@
 #!/bin/bash
 #$ -S /bin/bash
 #$ -N score
-#$ -q all.q
+#$ -q standard.q
 #$ -cwd
 #$ -v PATH
 #$ -o ./log/$JOB_ID.out

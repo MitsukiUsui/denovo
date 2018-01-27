@@ -22,7 +22,8 @@ def main(clusterFilepath, strainFilepath, phbFilepath, outFilepath):
     dct_lst=[]
     for _, row in cluster_df.iterrows():
         lineage=int(row["lineage"])
-        if lineage==1 or lineage == len(strain_lst):
+        #if lineage==1 or lineage == len(strain_lst):
+        if lineage == len(strain_lst):
             pass
         else:
             dct={ "family" : row["family"] }

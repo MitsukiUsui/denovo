@@ -26,9 +26,11 @@ def main(strainFilepath, mmseqsFilepath, outFilepath):
     strain_lst=[s.strip() for s in open(strainFilepath, 'r').readlines()]
     mmseqs_df=pd.read_csv(mmseqsFilepath, sep="\t", header=None)
     
+    #create ddct(finally dct) for each cluster. key:strain, val:list of orf_id
+    #value is list because multiple protain from same strain can be assign to the cluster
     dct_lst=[]
     prv=mmseqs_df[0].iloc[0]
-    ddct=init_ddct(prv)
+    ddct=init_ddct(prv) 
     for _, row in mmseqs_df.iterrows():
         if row[0]!=prv:
             dct_lst.append(ddct2dct(ddct, strain_lst))
@@ -46,8 +48,11 @@ def main(strainFilepath, mmseqsFilepath, outFilepath):
     print("DONE: output to {}".format(outFilepath))
 
 if __name__=="__main__":
-    target=sys.argv[1]
-    strainFilepath="../data/{}/strain.lst".format(target)
-    mmseqsFilepath="/data/mitsuki/data/ortho/{}/mmseqs/clu.tsv".format(target)
-    outFilepath="../data/{}/cluster.tsv".format(target)
+    strainFilepath=sys.argv[1]
+    mmseqsFilepath=sys.argv[2]
+    outFilepath=sys.argv[3]
+#    target=sys.argv[1]
+#    strainFilepath="../data/{}/strain.lst".format(target)
+#    mmseqsFilepath="/data/mitsuki/data/ortho/{}/mmseqs/clu.tsv".format(target)
+#    outFilepath="../data/{}/cluster.tsv".format(target)
     main(strainFilepath, mmseqsFilepath, outFilepath)

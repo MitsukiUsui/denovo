@@ -9,7 +9,7 @@ mkdir -p ${outDirec}
 
 for strain in `cat ${strainFilepath}`
 do
-	inFilepath=/data/mitsuki/data/ortho/${target}/dnaseq/${strain}.dnaseq
+	inFilepath=/data/mitsuki/data/denovo/${target}/dnaseq/${strain}.dnaseq
 	dbName=${outDirec}/${strain}
 	makeblastdb -in ${inFilepath} -dbtype nucl -out ${dbName}
 	echo "CREATED ${dbName}"

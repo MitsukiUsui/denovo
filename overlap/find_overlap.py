@@ -172,9 +172,10 @@ def main(strain, hitFilepath, geneFilepath, overlapFilepath):
 if __name__=="__main__":
     target=sys.argv[1]
     strain=sys.argv[2]
+    annotationType="prodigal"
     
     hitFilepath="../blastn/result/{}/{}.csv".format(target, strain)
-    gffFilepath="/data/mitsuki/data/ortho/{}/gff/{}.gff".format(target, strain)
+    gffFilepath="/data/mitsuki/data/denovo/{}/annotation/{}/gff/{}.gff".format(target, annotationType, strain)
     outDirec="./out/{}".format(target)
     os.makedirs(outDirec, exist_ok=True)
     overlapFilepath="{}/{}_ovr.csv".format(outDirec, strain)
