@@ -2,12 +2,14 @@
 
 import sys
 import pandas as pd
-from collections import defaultdict
+from collections import defaultdict, Counter
 import numpy as np
 
 import sys
 sys.path.append("../synteny")
-from synteny import calc_intra_synteny
+from synteny import calc_inter_synteny
+sys.path.append("../helper")
+from phase import PhaseController
 
 def get_strain_lst(target):
     strainFilepath="../data/{}/strain.lst".format(target)
@@ -29,14 +31,14 @@ def get_all_df(target, strain_lst):
     for strain in strain_lst:
         filepath="./out/{}/{}_ovr.csv".format(target, strain)
         try:
-            ovr_df=pd.read_csv(filepath)
+            ovr_df=pd.read_csv(filepath, dtype = {"relative":object})
             ovr_df["sstrain"]=strain
             dct_lst+=ovr_df.to_dict("records")
         except FileNotFoundError:
             print("WARN: {} does not exist".format(filepath))
     all_df=pd.DataFrame(dct_lst)
     column_lst=["overlap_id", "sstrain", "qstrain",  "olength", "score_dna", "score_pro", 
-                     "qfamily", "sfamily", "qorf_id", "sorf_id"]
+                     "qfamily", "sfamily", "qorf_id", "sorf_id", "relative"]
     all_df=all_df[column_lst]
     return all_df
 
@@ -56,7 +58,6 @@ class Stat:
             self.left = min(row["qfamily"], row["sfamily"])
             self.right = max(row["qfamily"], row["sfamily"])
         else:
-            
             assert row["qfamily"] in (self.left, self.right)
             assert row["sfamily"] in (self.left, self.right)
         self.rows.append(row)
@@ -94,6 +95,22 @@ class Stat:
             ret1 = self.ldf["olength"].mean()
             ret2 = self.rdf["olength"].mean()
             return ret1, ret2
+        
+    def get_phase(self):
+        self.calc()
+        if self.df.shape[0] == 0:
+            return None, None 
+        else:
+            pc = PhaseController()
+            phase_lst=[]
+            for phase in self.ldf["relative"]:
+                phase_lst.append(phase)
+            for phase in self.rdf["relative"]:
+                phase_lst.append(pc.revops(phase))
+
+            phase, confidence  = Counter(phase_lst).most_common()[0]
+            confidence /= len(phase_lst)
+            return phase, confidence
 
 def main(target, outFilepath):
     strain_lst=get_strain_lst(target)
@@ -117,18 +134,21 @@ def main(target, outFilepath):
         dct["left_hit_count"], dct["right_hit_count"] = stat.get_hitCount()
         dct["left_sbjct_count"], dct["right_sbjct_count"] = stat.get_sbjctCount()
         dct["left_average_length"], dct["right_average_length"] = stat.get_aveLength()
+        dct["phase"], dct["phase_conf"] = stat.get_phase()
         try:
-            dct["intra_synteny"] = calc_intra_synteny(key[0], key[1], synteny_df)
+            dct["inter_synteny"] = calc_inter_synteny(key[0], key[1], synteny_df)
         except:
-            dct["intra_synteny"] = -1
+            dct["inter_synteny"] = -1
         dct["left_lineage"] = family2lineage[key[0]]
         dct["right_lineage"]=family2lineage[key[1]]
         dct["both_lineage"]=(cluster_df[cluster_df["family"].isin(key)][strain_lst].isnull().sum(axis=0) ==0).sum()
         dct_lst.append(dct)
     out_df=pd.DataFrame(dct_lst)
-    out_df=out_df[["left", "right", "left_lineage", "right_lineage", "both_lineage", "intra_synteny",
-                         "left_hit_count", "right_hit_count", "left_sbjct_count", "right_sbjct_count", "left_average_length", "right_average_length"]]
-    out_df.to_csv(outFilepath, index=False)
+    out_df=out_df[["left", "right", "left_lineage", "right_lineage", "both_lineage", "inter_synteny",
+                         "left_hit_count", "right_hit_count", "left_sbjct_count", "right_sbjct_count", 
+                         "left_average_length", "right_average_length", "phase", "phase_conf"]]
+    out_df.index.name="event_id"
+    out_df.to_csv(outFilepath)
     print("DONE: summarize promissing hit into {}".format(outFilepath))
 
 if __name__=="__main__":

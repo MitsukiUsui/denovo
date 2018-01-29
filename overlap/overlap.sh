@@ -16,5 +16,6 @@ strain=`echo ${line} | cut -d ',' -f2`
 
 OUT=./log/overlap_${JOB_ID}_${SGE_TASK_ID}.out
 ERR=./log/overlap_${JOB_ID}_${SGE_TASK_ID}.err
-./find_overlap.py ${target} ${strain} 1>>${OUT} 2>>${ERR}
-./calc_identity.py ${target} ${strain} 1>>${OUT} 2>>${ERR}
+#./find_overlap.py ${target} ${strain} 1>>${OUT} 2>>${ERR}
+#./calc_identity.py ${target} ${strain} 1>>${OUT} 2>>${ERR}
+./assign_phase.py ${target} ${strain} 1>>${OUT} 2>>${ERR}

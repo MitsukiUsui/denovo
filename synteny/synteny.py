@@ -15,7 +15,7 @@ def calc_synteny(neighbor_lst):
     synteny = sum([e[1] for e in top]) / len(neighbor_lst)
     return neighbor, synteny
 
-def calc_intra_synteny(family1, family2, syn_df):
+def calc_inter_synteny(family1, family2, syn_df):
     neighbor1_lst = syn_df[syn_df["family"]==family1]["neighbor"].iloc[0].split(",")
     neighbor2_lst = syn_df[syn_df["family"]==family2]["neighbor"].iloc[0].split(",")
     c = Counter(neighbor1_lst+neighbor2_lst)
