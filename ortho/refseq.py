@@ -3,8 +3,9 @@
 import sys
 import re
 import pandas as pd
+import numpy as np
 from Bio import SeqIO
-from collections import defaultdict
+from collections import Counter
 
 sys.path.append("../helper")
 from gff import read_gff, write_gff
@@ -39,17 +40,17 @@ def edit_dnaseq(inFilepath, outFilepath, genomeId):
     """
     with open(outFilepath, "w") as f:
         for record in SeqIO.parse(inFilepath, "fasta"):
-            record.id = "{}:{}".format(genomeId ,record.id)  #add  genome_id to head
+            record.id = "{}-{}".format(genomeId ,record.id)  #add  genome_id to head
             SeqIO.write(record,  f, "fasta")
 
-def edit_gff(inFilepath, outFilepath, genomeId):
+def edit_gff(gff_df, outFilepath):
     """
     add genome_id to head of seqname, add orf_id attribute
     """
-    gff_df=read_gff(inFilepath, ["ID", "protein_id"])
-    gff_df = gff_df[gff_df["feature"]=="CDS"]  #filter only CDS
-    gff_df["seqname"] = ["{}:{}".format(genomeId, seqname) for seqname in gff_df["seqname"]]
-    gff_df["orf_id"] = ["{}:{}".format(genomeId, cds_id) for cds_id in gff_df["ID"]]
+    assert "orf_id" in gff_df.columns
+    
+    gff_df = gff_df[gff_df["feature"]=="CDS"].copy()  #filter only CDS
+    gff_df["seqname"] = ["{}-{}".format(genomeId, seqname) for seqname in gff_df["seqname"]]
 
     att_lst = []
     for _, row in gff_df.iterrows():
@@ -57,124 +58,124 @@ def edit_gff(inFilepath, outFilepath, genomeId):
         att_lst.append(att)
     gff_df["attribute"]=att_lst
     write_gff(outFilepath ,gff_df)
-
-def get_lookup_df(gffFilepath, fnaFilepath, faaFilepath):
+       
+def parse_description(description):
     """
-    connect 3 file and create lookup table
-    orf_id, fna_id, protein_id is used as respective identifier.
-    currently, faaFilepath is not used at all, but we need to check whether protein_id is valid or not before returning.
+    parse description straing written in .fna
     """
-    
-    def parse_description(description):
-        """
-        parse description straing written in .fna
-        """
-        
-        element_lst = re.findall('\[(.*?)\]', record.description) # ? for shortest match
-        dct = {}
-        for e in element_lst:
-            e = e.split("=")
-            if len(e)==2:
-                dct[e[0]]=e[1]
-        return dct
-    
-    print("START: connect 3 information written in gff, fna, and faa")
-    
-    gff_df=read_gff(gffFilepath, ["orf_id", "protein_id"])
-    lookup_df1=gff_df[["orf_id", "protein_id"]]
-    lookup_df1 = lookup_df1.rename(columns = {"protein_id": "protein_id1"})
-    lookup_df1 = lookup_df1.drop_duplicates(subset=['orf_id'])
-    print("\tDONE: find {} CDSs in .gff. remove {} duplication".format(lookup_df1.shape[0] , gff_df.shape[0] - lookup_df1.shape[0]))
-    
-    dct_lst=[]
-    for record in SeqIO.parse(fnaFilepath, "fasta"):
-        dct={}
-        dct["fna_id"]=record.id
-        dct["orf_id"]="{}:cds{}".format(genomeId, int(dct["fna_id"].split("_")[-1]) - 1)
-        description = parse_description(record.description)
-        if "protein_id" in description.keys():
-            dct["protein_id2"] = description["protein_id"]
-        dct_lst.append(dct)
-    lookup_df2=pd.DataFrame(dct_lst)
-    print("\tDONE: find {} dna seqs in .fna".format(lookup_df2.shape[0]))
+    element_lst = re.findall('\[(.*?)\]', description) # ? for shortest match
+    dct = {}
+    for e in element_lst:
+        e = e.split("=")
+        if len(e)==2:
+            dct[e[0]]=e[1]
+    return dct
 
-    assert lookup_df1.shape[0] == lookup_df2.shape[0]
-    lookup_df=pd.merge(lookup_df1, lookup_df2, on="orf_id", how="inner")
-    assert lookup_df.shape[0] == lookup_df1.shape[0]
-    pro_lst=[]
-    for pro1, pro2 in zip(lookup_df["protein_id1"], lookup_df["protein_id2"]):
-        if pro1 == pro2:
-            pro_lst.append(pro1)
+def set_orfId(gff_df):
+    """
+    format of orf_id is ${genome_id}-${cds_id}_${cds_id_count}
+    cds_id_count is required only when cds_id is not unique
+    """
+    assert "ID" in gff_df.columns
+    
+    counter = Counter(gff_df[gff_df["feature"]=="CDS"]["ID"])
+    duplication_lst=[key for key, val in counter.items() if val > 1]
+#    print("DEBUG: found {} duplication for cds_id".format(len(duplication_lst), file=sys.stderr))
+    
+    #assign orfId for every row based on "ID" and counter
+    orfId_lst=[] 
+    for _, row in gff_df.iterrows():
+        if row["feature"] != "CDS":
+            orfId_lst.append(np.nan)
         else:
-            pro_lst.append(None)
-    lookup_df["protein_id"]=pro_lst
-    lookup_df=lookup_df[["orf_id", "fna_id", "protein_id"]]
-    lookup_df=lookup_df[lookup_df.isnull().sum(axis=1) == 0]
-    print("\tDONE: find {} valid commbination".format(lookup_df.shape[0]))
+            cdsId = row["ID"]
+            if cdsId in duplication_lst:
+                orfId = "{}-{}_{}".format(genomeId, cdsId, counter[cdsId])
+                counter[cdsId]-=1
+            else:
+                orfId = "{}-{}".format(genomeId, cdsId)
+            orfId_lst.append(orfId)
+    gff_df["orf_id"] = orfId_lst
+    return gff_df
+
+def get_lookup_df(gff_df): 
+    for col in ["ID","Parent", "locus_tag", "protein_id", "pseudo"]:
+        assert col in gff_df.columns
+    
+    gene2loc={} # given gene_id, return locus_tag
+    dct_lst=[]
+    for _, row in gff_df.iterrows():
+        if row["feature"] == "gene":
+            gene2loc[row["ID"]] = row["locus_tag"]
+        elif row["feature"]=="CDS":
+            dct = {}
+            dct["orf_id"] = row["orf_id"]
+            dct["protein_id"] = row["protein_id"]
+
+            if row["Parent"] in gene2loc.keys(): #assume Parent gene record is already processed
+                dct["locus_tag"] = gene2loc[row["Parent"]]
+            elif row["pseudo"] == "true":
+                pass
+            else:
+                print("WARN: {} lack protein information for some reason.".format(dct["orf_id"]), file = sys.stderr)
+            dct_lst.append(dct)
+    lookup_df=pd.DataFrame(dct_lst)
+    lookup_df=lookup_df[["orf_id", "locus_tag", "protein_id"]]
     return lookup_df
-    
-def get_lookup_dct(lookup_df):
-    fna2orf = {}
-    pro2orf = defaultdict(list)
-    for _, row in lookup_df.iterrows():
-        fna2orf[row["fna_id"]] = row["orf_id"] # fna_id and orf_id one to one
-        pro2orf[row["protein_id"]].append(row["orf_id"]) # multiple orf_id can have same fna_id
-    return fna2orf, pro2orf
-    
-def edit_fna(inFilepath, outFilepath, fna2orf):
-    with open(outFilepath, "w") as f:
-        totalCount, outputCount = 0, 0
-        for record in SeqIO.parse(inFilepath, "fasta"):
-            totalCount+=1
-            if record.id in fna2orf.keys():
-                outputCount+=1
-                record.id = fna2orf[record.id]
-                record.description = ""
-                SeqIO.write(record,  f, "fasta")
-    print("DONE: output {}/{} dna seqs to {}".format(outputCount, totalCount, outFilepath))
-    
-def edit_faa(inFilepath, outFilepath, pro2orf):
-    with open(outFilepath, "w") as f:
-        totalCount, outputCount = 0, 0
-        for record in SeqIO.parse(inFilepath, "fasta"):
-            totalCount+=1
-            for orfId in pro2orf[record.id]:
-                outputCount += 1
-                record.id = orfId
-                record.description = "" #need to remove description because its too long for phylophlan (FastTree)
-                SeqIO.write(record,  f, "fasta")
-    print("DONE: output {}/{} protein seqs to {}".format(outputCount, totalCount, outFilepath))
-    
+        
 def main(target, basename, genomeId):
-    infp, outfp = get_fp(target, basename, genomeId)
     
-    print("IN")
+    #organize input & output filepath
+    infp, outfp = get_fp(target, basename, genomeId)
+    print("IN:")
     for category in ("dnaseq", "fna", "faa", "gff"):
         print("\t{}".format(infp[category]))
-    print("OUT")
+    print("OUT:")
     for category in ("dnaseq", "fna", "faa", "gff"):
         print("\t{}".format(outfp[category]))
     print()
         
+    
     edit_dnaseq(infp["dnaseq"], outfp["dnaseq"], genomeId)
     print("DONE: output to {}".format(outfp["dnaseq"]))
     
-    edit_gff(infp["gff"], outfp["gff"], genomeId)
-    print("DONE: output to {}".format(outfp["gff"]))
+    gff_df = read_gff(infp["gff"], ["ID","Parent", "locus_tag", "protein_id", "pseudo"])
+    gff_df = set_orfId(gff_df)
+    lookup_df=get_lookup_df(gff_df)
     
-    lookup_df=get_lookup_df(outfp["gff"], infp["fna"], infp["faa"])
-    if lookup_df.shape[0] < 10:
-        print("ERROR: seemed to fail to finding valid combination between gff, fna and faa.", file=sys.stderr)
-        print("\tplease exclude {} ({}) from downstream analysis".format(genomeId, basename), file=sys.stderr)
-        exit(1)
-    else:
-        fna2orf, pro2orf = get_lookup_dct(lookup_df)
-        edit_fna(infp["fna"], outfp["fna"], fna2orf)
-        edit_faa(infp["faa"], outfp["faa"], pro2orf)
+    print("START: load FASTA")
+    loc2rec={} #locus_tag to dna record
+    for rec in SeqIO.parse(infp["fna"], "fasta"):
+        description = parse_description(rec.description)
+        loc2rec[description["locus_tag"]] = rec
+    print("\tDONE: load {} dna seq".format(len(loc2rec)))
+    pro2rec={} #protein_id to protein record
+    for rec in SeqIO.parse(infp["faa"], "fasta"):
+        pro2rec[rec.id] = rec
+    print("\tDONE: load {} protein seq".format(len(pro2rec)))
+    
+    print("DONE: output FASTA for {}/{} cds".format(lookup_df.dropna().shape[0], lookup_df.shape[0]))
+    with open(outfp["fna"], "w") as fna, open(outfp["faa"], "w") as faa:
+        for _, row in lookup_df.dropna().iterrows():
+            dnaRec=loc2rec[row["locus_tag"]]
+            desc = parse_description(dnaRec.description)
+            if ("protein_id" in desc.keys()) and desc["protein_id"] != row["protein_id"]:  #check the validness of lookup_df
+                print("ERROR: lookup table has incorrect matching for {}".format(row["orf_id"]), file=sys.stderr)
+                exit(1)
+            dnaRec.id = row["orf_id"]
+            SeqIO.write(dnaRec, fna, "fasta")
+
+            proRec = pro2rec[row["protein_id"]]
+            proRec.id = row["orf_id"]
+            SeqIO.write(proRec, faa, "fasta")
+        print("\tDONE: output {}".format(outfp["fna"]))
+        print("\tDONE: output {}".format(outfp["faa"]))
+
+    edit_gff(gff_df, outfp["gff"])
+    print("DONE: output to {}".format(outfp["gff"]))
 
 if __name__=="__main__":
     target = sys.argv[1]
     basename = sys.argv[2]
     genomeId = sys.argv[3]
     main(target, basename, genomeId)
-    

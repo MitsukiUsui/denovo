@@ -9,7 +9,7 @@
 #$ -l mem_free=30G
 
 target=${1}
-annotationType=prodigal
+annotationType=refseq
 baseDirec=/data/mitsuki/data/denovo/${target}/annotation/${annotationType}
 mmseqsDirec=${baseDirec}/mmseqs
 mkdir -p ${mmseqsDirec}

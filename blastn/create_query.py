@@ -6,7 +6,7 @@ import pandas as pd
 from Bio import SeqIO
 
 def output_query(ext, strain_lst, lookup_df):
-    annotationType = "prodigal"
+    annotationType = "refseq"
 
     print("START: load {} {} seqs".format(len(strain_lst), ext))
     orf2record={}
