@@ -51,8 +51,4 @@ if __name__=="__main__":
     strainFilepath=sys.argv[1]
     mmseqsFilepath=sys.argv[2]
     outFilepath=sys.argv[3]
-#    target=sys.argv[1]
-#    strainFilepath="../data/{}/strain.lst".format(target)
-#    mmseqsFilepath="/data/mitsuki/data/ortho/{}/mmseqs/clu.tsv".format(target)
-#    outFilepath="../data/{}/cluster.tsv".format(target)
     main(strainFilepath, mmseqsFilepath, outFilepath)

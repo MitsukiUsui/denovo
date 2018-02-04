@@ -24,7 +24,8 @@ do
 done < ${strainFilepath}
 
 cd ${phyloDirec}
-./phylophlan.py -u ${target} --nproc 10
+./phylophlan.py -u ${target} --nproc 10 1>/dev/null 2>/dev/null
 
 nwkFilepath=${phyloDirec}/output/${target}/${target}.tree.nwk
 ln -s ${nwkFilepath} ${outFilepath}
+echo "DONE: ${outFilepath}"

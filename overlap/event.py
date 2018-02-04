@@ -27,19 +27,26 @@ def get_synteny_df(target):
     return synteny_df
 
 def get_all_df(target, strain_lst):
+    """
+    read ovr.csv & phase.csv for each strain and return all the information
+    """
+    
+    col_lst =  ["overlap_id", "sstrain", "qstrain",  "olength",  "qfamily", "sfamily", "qorf_id", "sorf_id", "relative"]
+
     dct_lst=[]
     for strain in strain_lst:
-        filepath="./out/{}/{}_ovr.csv".format(target, strain)
+        ovrFilepath="./out/{}/{}_ovr.csv".format(target, strain)
+        phaseFilepath = "./out/{}/{}_phase.csv".format(target, strain)
         try:
-            ovr_df=pd.read_csv(filepath, dtype = {"relative":object})
-            ovr_df["sstrain"]=strain
-            dct_lst+=ovr_df.to_dict("records")
+            ovr_df=pd.read_csv(ovrFilepath, dtype = {"relative":object})
         except FileNotFoundError:
-            print("WARN: {} does not exist".format(filepath))
+            print("WARN: {} does not exist".format(ovrFilepath))
+        else:
+            ovr_df = ovr_df[col_lst]
+            msk = (~ovr_df["relative"].isnull()) & (ovr_df["relative"] != "+0")
+            dct_lst += ovr_df[msk].to_dict("records")
     all_df=pd.DataFrame(dct_lst)
-    column_lst=["overlap_id", "sstrain", "qstrain",  "olength", "score_dna", "score_pro", 
-                     "qfamily", "sfamily", "qorf_id", "sorf_id", "relative"]
-    all_df=all_df[column_lst]
+    all_df=all_df[col_lst]
     return all_df
 
 def get_family2lineage(cluster_df):
@@ -115,15 +122,14 @@ class Stat:
 def main(target, outFilepath):
     strain_lst=get_strain_lst(target)
     all_df=get_all_df(target, strain_lst)
-    high_df=all_df[(all_df["score_pro"] < 20) & (all_df["score_dna"] > 100)].copy()  # filter high quality
-    print("DONE: filter {}/{} promissing hit.".format(high_df.shape[0], all_df.shape[0]))
+    print("DONE: load {} promissing hit".format(all_df.shape[0]))
     cluster_df=get_cluster_df(target)
     synteny_df=get_synteny_df(target)
     family2lineage=get_family2lineage(cluster_df)
     
     # update stat object
     key2stat = defaultdict(Stat)
-    for _, row in high_df.iterrows():
+    for _, row in all_df.iterrows():
         key = (min(row["qfamily"], row["sfamily"]), max(row["qfamily"], row["sfamily"]))
         key2stat[key].update(row)
     

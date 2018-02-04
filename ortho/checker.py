@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+
+import sys
+import os
+import pandas as pd
+sys.path.append("../helper")
+from gff import read_gff
+
+target=sys.argv[1]
+annotType="refseq"
+
+strainFilepath="../data/{}/strain.lst".format(target)
+strain_lst=[s.strip() for s in open(strainFilepath, 'r').readlines()]
+
+# check cluster.tsv
+clusterFilepath="../data/{}/cluster.tsv".format(target)
+cluster_df=pd.read_csv(clusterFilepath, delimiter='\t', dtype="object")
+for col in ["family", "lineage", "size"] + strain_lst:
+    if not(col in cluster_df.columns):
+        print("ERROR: {} dose not have column {}".format(clusterFilepath, col), file = sys.stderr)
+        exit(1)
+
+# check gff
+for strain in strain_lst:
+    gffFilepath = "/data/mitsuki/data/denovo/{}/annotation/{}/gff/{}.gff".format(target, annotType, strain)
+    try:
+        read_gff(gffFilepath, ["family"])
+    except KeyError:
+        print("ERROR: {} does not have family information".format(gffFilepath), file = sys.stderr)
+        exit(2)
+        
+exit(0)

@@ -38,11 +38,20 @@ jobId=`echo ${jobId_r} | cut -d '.' -f1`
 echo "submitted ${numJobs} jobs with job_id=${jobId}, dependency=${prevJobId}"
 
 #--------------------------------------------------------------------------------
-# protein clustering with mmseqs2
+# protein clustering 
 #--------------------------------------------------------------------------------
-cmd=cluster.sh
+cmd=sonic.sh
 numJobs=1
 prevJobId=${jobId}
 jobId=`qsub -terse -hold_jid ${prevJobId} ${cmd} ${target}`
 echo "submitted ${numJobs} jobs with job_id=${jobId}, dependency=${prevJobId}"
+
+#--------------------------------------------------------------------------------
+# check if pipeline above worked correctly
+#--------------------------------------------------------------------------------
+cmd=checker.sh
+numJobs=1
+prevJobId=${jobId}
+jobId=`qsub -terse -hold_jid ${prevJobId} ${cmd} ${target}`
+echo "submitted checker with job_id=${jobId}, dependency=${prevJobId}"
 

@@ -2,10 +2,12 @@
 
 """
 add family column to .gff.
+can be work when one orf_id belongs to multiple family, although this is not the case for sonicparanoid
 """
 
 import pandas as pd
 from io import StringIO
+from collections import defaultdict
 import os
 import sys
 
@@ -15,22 +17,24 @@ from gff import read_gff, write_gff
 def main(strain, clusterFilepath, inFilepath, outFilepath):
     cluster_df=pd.read_csv(clusterFilepath, delimiter="\t")
     filter_df=cluster_df[~cluster_df[strain].isnull()]
-    orf2family={}
+    orf2family=defaultdict(list) # key: orf_id , val: list of families which belongs to
     for family, orfIds in zip(filter_df["family"], filter_df[strain]):
         for orfId in orfIds.split(","):
-            orf2family[orfId]=family
-          
+            orf2family[orfId].append(family)
+            
     # add family information to attribute
     gff_df=read_gff(inFilepath, additional_lst=["orf_id"])
     attribute_lst=[]
     assignCount = 0
-    for _, row in gff_df.iterrows(): #!!! assuming every row is CDS. need to fix later
+    for _, row in gff_df.iterrows(): #!!! assuming every row is CDS
         if row["orf_id"] in orf2family.keys():
             assignCount += 1
-            att = "{};family={}".format(row["attribute"], orf2family[row["orf_id"]])
+            att = "{};family={}".format(row["attribute"], ",".join(orf2family[row["orf_id"]]) )
             attribute_lst.append(att)
-        else:
+        else: # when this CDS is pseudogene, no sequence information in FASTA so that no family information is given
+#            print("DEBUG: {} has no family information".format(row["orf_id"]))
             attribute_lst.append(row["attribute"])
+    assert assignCount == len(orf2family) #every orf_id should appear exactly once in gff, as orf_id is uniquely defined
     gff_df["attribute"]=attribute_lst
     write_gff(outFilepath, gff_df)
     print("DONE: output {}".format(outFilepath))
@@ -38,7 +42,7 @@ def main(strain, clusterFilepath, inFilepath, outFilepath):
     
 if __name__=="__main__":
     target=sys.argv[1]
-    annType="prodigal"
+    annType=sys.argv[2]
     clusterFilepath="../data/{}/cluster.tsv".format(target)    
     strainFilepath="../data/{}/strain.lst".format(target)
     strain_lst=[s.strip() for s in open(strainFilepath, 'r').readlines()]

@@ -16,7 +16,8 @@ def output_family2rec(family2rec, outDirec, ext):
                 SeqIO.write(rec, f, "fasta")
 
 def main(target, strain_lst):
-    prodigalDirec="/data/mitsuki/data/denovo/{}/annotation/prodigal".format(target)
+    annotType="refseq"
+    prodigalDirec="/data/mitsuki/data/denovo/{}/annotation/{}".format(target, annotType)
     
     print("START: parse {} * 2 FASTA files".format(len(strain_lst)))
     family2fna=defaultdict(list)

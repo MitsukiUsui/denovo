@@ -11,6 +11,6 @@ for strain in `cat ${strainFilepath}`
 do
 	inFilepath=/data/mitsuki/data/denovo/${target}/dnaseq/${strain}.dnaseq
 	dbName=${outDirec}/${strain}
-	makeblastdb -in ${inFilepath} -dbtype nucl -out ${dbName}
+	makeblastdb -in ${inFilepath} -dbtype nucl -out ${dbName} -logfile /dev/null
 	echo "CREATED ${dbName}"
 done
