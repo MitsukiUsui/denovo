@@ -32,10 +32,15 @@ def calc_inter_synteny(family1, family2, syn_df):
     return commonCount/len(neighbor1_lst+neighbor2_lst)
 
 def get_orf2synteny(strain_lst, gffDirec):
+    """
+    key: orf_id
+    val:  dictionary of ["neighbor", "left", "right", "strand"]
+    """
     orf2synteny = {}
     for strain in strain_lst:
         gffFilepath="{}/{}.gff".format(gffDirec, strain)
-        gff_df=read_gff(gffFilepath, ["orf_id", "family"])
+        gff_df = read_gff(gffFilepath, ["orf_id", "family"])
+        gff_df = gff_df[~gff_df["family"].isnull()] #drop rows for pseudogenes which does not have family information
         
         for seqname in set(gff_df["seqname"]):
             filtered_df = gff_df[gff_df["seqname"]==seqname].copy()
@@ -97,8 +102,8 @@ def get_synteny_df(cluster_df, orf2synteny, strain_lst):
 def main(target, strainFilepath, clusterFilepath, outFilepath):
     strain_lst=[s.strip() for s in open(strainFilepath, 'r').readlines()]
     cluster_df=pd.read_csv(clusterFilepath, delimiter="\t")
+    annotationType="refseq"
     
-    annotationType="prodigal"
     gffDirec="/data/mitsuki/data/denovo/{}/annotation/{}/gff".format(target, annotationType)
     print("START: gather synteny information for {} strains".format(len(strain_lst)))
     orf2synteny=get_orf2synteny(strain_lst, gffDirec)
@@ -112,4 +117,4 @@ if __name__=="__main__":
     strainFilepath="../data/{}/strain.lst".format(target)
     clusterFilepath="../data/{}/cluster.tsv".format(target)
     outFilepath = "../data/{}/synteny.tsv".format(target)
-    main(target, strainFilepath, clusterFilepath, outFilepath)
+    main(target,  strainFilepath, clusterFilepath, outFilepath)

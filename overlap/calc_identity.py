@@ -95,7 +95,7 @@ def read_fasta(filepath_lst):
 if __name__=="__main__":
     target=sys.argv[1]
     strain=sys.argv[2]
-    annotationType="prodigal"
+    annotationType="refseq"
 
     overlapFilepath="./out/{}/{}_ovr.csv".format(target, strain)
     logFilepath="./out/{}/{}_ovr.fasta".format(target, strain)

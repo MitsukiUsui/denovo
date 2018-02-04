@@ -23,7 +23,7 @@ def main(target, subStrain, lookupFilepath):
     for _,row in out_df.iterrows():
         dct={}
         dct["sstrain"]=subStrain
-        dct["qstrain"]=row["qseqid"].split(':')[0]
+        dct["qstrain"]=row["qseqid"].split('-')[0]
         if row["sstart"]<row["send"]:
             dct["hit_strand"]=1
         else:

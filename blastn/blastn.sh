@@ -22,11 +22,10 @@ queryFilepath=${dir}/query/${target}/${strain}.fna
 outFilepath=${dir}/result/${target}/${strain}.tab
 mkdir -p `dirname ${outFilepath}`
 
-blastn -db ${dbName}\
-	   -query ${queryFilepath}\
-	   -out ${outFilepath}\
-	   -word_size 6\
-	   -evalue 1e-3\
-	   -outfmt 6 1>>${OUT} 2>>${ERR}
-
+time blastn -db ${dbName}\
+            -query ${queryFilepath}\
+            -out ${outFilepath}\
+            -word_size 6\
+            -evalue 1e-3\
+            -outfmt 6 1>>${OUT} 2>>${ERR}
 ./blastn_post.py ${target} ${strain} 1>>${OUT} 2>>${ERR}

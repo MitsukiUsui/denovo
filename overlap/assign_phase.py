@@ -28,17 +28,11 @@ def get_six_frame(dnaSeq):
             qtrans_lst.append(subSeq.translate(table=11))
     return qtrans_lst
 
-def get_phase_dct(overlapId, id2rec):
+def get_phase_dct(qseq_dna, sseq_dna, qseq_pro, sseq_pro):
     """
-    assign relative reading frame between the 2 sequence of the overlap, by caluculating protein alignment score against 6 frame translation
+    assign relative reading frame between the 2 sequence of the overlap, by caluculating protein alignment score against 6 frame translation of qseq_dna
     """
     
-    # extract sequence information
-    qseq_dna=id2rec["{}:qseq_dna".format(overlapId)].seq
-    sseq_dna=id2rec["{}:sseq_dna".format(overlapId)].seq # never been used for now
-    qseq_pro=id2rec["{}:qseq_pro".format(overlapId)].seq
-    sseq_pro=id2rec["{}:sseq_pro".format(overlapId)].seq
-
     # calcurate alignment score against 6 frame translation of qseq_dna (can be sseq_dna though)
     qtrans_lst=get_six_frame(qseq_dna)
     qscore_lst, sscore_lst=[], []
@@ -54,7 +48,7 @@ def get_phase_dct(overlapId, id2rec):
     srf = np.argmax(sscore_lst)
     
     #update dct and return
-    dct={"overlap_id" : overlapId}
+    dct = {}
     for i in range(6):
         dct["qscore{}".format(i)]=qscore_lst[i]
         dct["sscore{}".format(i)]=sscore_lst[i]
@@ -62,35 +56,43 @@ def get_phase_dct(overlapId, id2rec):
     dct["relative"]=pc.phase_lst[pc.relative_int(qrf, srf)]
     return dct
 
-def main(seqFilepath, ovrFilepath, phaseFilepath):
-    id2rec={}
-    for seqRec in SeqIO.parse(seqFilepath, "fasta"):
-        id2rec[seqRec.id]=seqRec
-    print("DONE: load {} sequence information".format(int(len(id2rec)/4)))
+def main(ovrFilepath, seqFilepath, phaseFilepath):
+    rec_lst = []
+    for rec in SeqIO.parse(seqFilepath, "fasta"):
+        rec_lst.append(rec)
     
-    ovr_df=pd.read_csv(ovrFilepath)
-    high_df=ovr_df[(ovr_df["score_pro"] < 20) & (ovr_df["score_dna"] > 100)].copy()  # filter high quality
-    print("DONE: filter {}/{} promissing hit.".format(high_df.shape[0], ovr_df.shape[0]))
-    
-    dct_lst=[]
-    for overlapId in high_df["overlap_id"]:
-        dct_lst.append(get_phase_dct(overlapId, id2rec))
+    assert len(rec_lst) % 4 == 0
+    numOvr = int(len(rec_lst)/4)
+    print("START: assign phase to {} overlaps".format(numOvr))
+    dct_lst = []
+    for i in range(numOvr):
+        qseq_dna = rec_lst[4 * i + 0].seq
+        sseq_dna = rec_lst[4 * i + 1].seq
+        qseq_pro = rec_lst[4 * i + 2].seq
+        sseq_pro = rec_lst[4 * i + 3].seq
+       
+        overlapId = int(rec_lst[4 * i + 0].id.split(':')[0])
+        dct = {"overlap_id": overlapId}
+        dct.update(get_phase_dct(qseq_dna, sseq_dna, qseq_pro, sseq_pro))
+        dct_lst.append(dct)
     phase_df=pd.DataFrame(dct_lst)
     column_lst=["overlap_id", "relative"] + ["qscore{}".format(i) for i in range(6)] + ["sscore{}".format(i) for i in range(6)]
     phase_df = phase_df[column_lst]
     phase_df.to_csv(phaseFilepath, index=False)
     print("DONE: output  {}".format(phaseFilepath))
     
+    
+    ovr_df = pd.read_csv(ovrFilepath)
     ovr_df = pd.merge(ovr_df, phase_df[["overlap_id", "relative"]], on = "overlap_id", how = "left")
-    ovr_df.to_csv(ovrFilepath , index=False)
-    print("DONE: update {}".format(ovrFilepath))
+    ovr_df.to_csv(ovrFilepath, index = False)
+    print("DONE: append relative column to {}".format(ovrFilepath))
 
 if __name__=="__main__":
     target=sys.argv[1]
     strain=sys.argv[2]
     
     direc="./out/{}".format(target)
-    seqFilepath="{}/{}_ovr.fasta".format(direc, strain)
     ovrFilepath="{}/{}_ovr.csv".format(direc, strain)
+    seqFilepath="{}/{}_ovr.fasta".format(direc, strain)
     phaseFilepath="{}/{}_phase.csv".format(direc, strain)
-    main(seqFilepath, ovrFilepath, phaseFilepath)
+    main(ovrFilepath, seqFilepath, phaseFilepath)

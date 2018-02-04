@@ -172,7 +172,7 @@ def main(strain, hitFilepath, geneFilepath, overlapFilepath):
 if __name__=="__main__":
     target=sys.argv[1]
     strain=sys.argv[2]
-    annotationType="prodigal"
+    annotationType="refseq"
     
     hitFilepath="../blastn/result/{}/{}.csv".format(target, strain)
     gffFilepath="/data/mitsuki/data/denovo/{}/annotation/{}/gff/{}.gff".format(target, annotationType, strain)
