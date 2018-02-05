@@ -19,17 +19,17 @@ waitfor() {
     done
 }
 
-echo "START: meta-pipeline for ${target} @${statusFilename}"
+echo "START: meta-pipeline for ${target} @${TIMESTAMP}"
 
 #--------------------------------------------------------------------------------
 # STEP0. download data
 #--------------------------------------------------------------------------------
-#step=download
-#echo "START: ${step}"
-#cd ./${step}
-#./pipeline.sh ${target}
-#cd ../
-#echo "DONE: ${step}"
+step=download
+echo "START: ${step}"
+cd ./${step}
+./pipeline.sh ${target}
+cd ../
+echo "DONE: ${step}"
 
 #--------------------------------------------------------------------------------
 # STEP1. ortholog clustering
@@ -43,6 +43,7 @@ waitfor ${statusFilename}
 status=`cat ${statusFilename}`
 if [ ${status} -eq 0 ]; then
     echo "DONE: ${step}"
+    rm ${statusFilename}
     cd ../
 else
     echo "ERROR: in ${step}"
@@ -61,6 +62,7 @@ waitfor ${statusFilename}
 status=`cat ${statusFilename}`
 if [ ${status} -eq 0 ]; then
     echo "DONE: ${step}"
+    rm ${statusFilename}
     cd ../
 else
     echo "ERROR: in ${step}"
@@ -89,6 +91,7 @@ waitfor ${statusFilename}
 status=`cat ${statusFilename}`
 if [ ${status} -eq 0 ]; then
     echo "DONE ${step}"
+    rm ${statusFilename}
     cd ../
 else
     echo "ERROR in ${step}"

@@ -2,6 +2,7 @@
 
 target=${1}
 statusFilename=${2}
+if [ -z ${statusFilename+x} ]; then statusFilename=.STATUS; fi;
 
 ./create_database.sh ${target}
 ./myphylophlan.sh ${target}

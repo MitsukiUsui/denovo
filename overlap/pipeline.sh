@@ -2,6 +2,7 @@
 
 target=${1}
 statusFilename=${2}
+if [ -z ${statusFilename+x} ]; then statusFilename=.STATUS; fi;
 
 cmd=overlap.sh
 argCmd=./arg/${cmd%.*}.py
