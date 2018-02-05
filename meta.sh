@@ -1,8 +1,10 @@
 #!/bin/bash
 
+MYVERSION=1.0
+TIMESTAMP=`date +%s`
+
 target=${1}
-annotType=refseq
-statusFilepath=.STATUS
+statusFilename=.${TIMESTAMP}
 
 waitfor() {
     filepath=${1}
@@ -17,13 +19,16 @@ waitfor() {
     done
 }
 
-echo "START: meta-pipeline for ${target},${annotType}"
+echo "START: meta-pipeline for ${target} @${statusFilename}"
 
+#--------------------------------------------------------------------------------
+# STEP0. download data
+#--------------------------------------------------------------------------------
 #step=download
 #echo "START: ${step}"
 #cd ./${step}
 #./pipeline.sh ${target}
-#../
+#cd ../
 #echo "DONE: ${step}"
 
 #--------------------------------------------------------------------------------
@@ -32,11 +37,10 @@ echo "START: meta-pipeline for ${target},${annotType}"
 step=ortho
 echo "START: ${step}"
 cd ./${step}
-rm ${statusFilepath}
-./pipeline.sh ${target} ${annotType}
+./pipeline.sh ${target} ${statusFilename}
 
-waitfor ${statusFilepath}
-status=`cat ${statusFilepath}`
+waitfor ${statusFilename}
+status=`cat ${statusFilename}`
 if [ ${status} -eq 0 ]; then
     echo "DONE: ${step}"
     cd ../
@@ -51,11 +55,10 @@ fi
 step=blastn
 echo "START: ${step}"
 cd ./${step}
-rm ${statusFilepath}
-./pipeline.sh ${target} ${annotType}
+./pipeline.sh ${target} ${statusFilename}
 
-waitfor ${statusFilepath}
-status=`cat ${statusFilepath}`
+waitfor ${statusFilename}
+status=`cat ${statusFilename}`
 if [ ${status} -eq 0 ]; then
     echo "DONE: ${step}"
     cd ../
@@ -80,11 +83,10 @@ echo "DONE: ${step}"
 step=overlap
 echo "START: ${step}"
 cd ./${step}
-rm ${statusFilepath}
-./pipeline.sh ${target}
+./pipeline.sh ${target} ${statusFilename}
 
-waitfor ${statusFilepath}
-status=`cat ${statusFilepath}`
+waitfor ${statusFilename}
+status=`cat ${statusFilename}`
 if [ ${status} -eq 0 ]; then
     echo "DONE ${step}"
     cd ../
@@ -94,3 +96,4 @@ else
 fi
 
 echo "DONE: all steps successfully"
+echo "${target},${MYVERSION},${TIMESTAMP}" >> record.txt
