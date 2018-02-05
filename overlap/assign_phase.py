@@ -35,6 +35,9 @@ def get_phase_dct(qseq_dna, sseq_dna, qseq_pro, sseq_pro):
     
     # calcurate alignment score against 6 frame translation of qseq_dna (can be sseq_dna though)
     qtrans_lst=get_six_frame(qseq_dna)
+    qseq_pro = str(qseq_pro).replace('U', 'X')
+    sseq_pro = str(sseq_pro).replace('U', 'X')
+
     qscore_lst, sscore_lst=[], []
     for qtrans in qtrans_lst:
         qtrans = str(qtrans).replace('*','X')

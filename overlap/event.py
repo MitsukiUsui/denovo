@@ -39,10 +39,12 @@ def get_all_df(target, strain_lst):
         phaseFilepath = "./out/{}/{}_phase.csv".format(target, strain)
         try:
             ovr_df=pd.read_csv(ovrFilepath, dtype = {"relative":object})
+            ovr_df = ovr_df[col_lst]
         except FileNotFoundError:
             print("WARN: {} does not exist".format(ovrFilepath))
+        except KeyError:
+            print("WARN: {} does not have relative column".format(ovrFilepath))
         else:
-            ovr_df = ovr_df[col_lst]
             msk = (~ovr_df["relative"].isnull()) & (ovr_df["relative"] != "+0")
             dct_lst += ovr_df[msk].to_dict("records")
     all_df=pd.DataFrame(dct_lst)
