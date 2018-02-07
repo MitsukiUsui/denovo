@@ -1,7 +1,8 @@
 #!/bin/bash
 
-MYVERSION=1.0
+MYVERSION="ver1.1"
 TIMESTAMP=`date +%s`
+DATE=`date -d @${TIMESTAMP}`
 
 target=${1}
 statusFilename=.${TIMESTAMP}
@@ -99,4 +100,4 @@ else
 fi
 
 echo "DONE: all steps successfully"
-echo "${target},${MYVERSION},${TIMESTAMP}" >> record.txt
+echo "${target},${MYVERSION},${TIMESTAMP},${DATE}" >> record.txt
