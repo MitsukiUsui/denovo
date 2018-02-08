@@ -57,7 +57,7 @@ def edit_gff(gff_df, outFilepath):
         att = "{};orf_id={}".format(row["attribute"], row["orf_id"])
         att_lst.append(att)
     gff_df["attribute"]=att_lst
-    write_gff(outFilepath ,gff_df)
+    write_gff(gff_df, outFilepath)
        
 def parse_description(description):
     """
