@@ -36,7 +36,7 @@ def main(strain, clusterFilepath, inFilepath, outFilepath):
             attribute_lst.append(row["attribute"])
     assert assignCount == len(orf2family) #every orf_id should appear exactly once in gff, as orf_id is uniquely defined
     gff_df["attribute"]=attribute_lst
-    write_gff(outFilepath, gff_df)
+    write_gff(gff_df, outFilepath)
     print("DONE: output {}".format(outFilepath))
     print("\tassigned family to {}/{} CDS".format(assignCount, gff_df.shape[0]))
     

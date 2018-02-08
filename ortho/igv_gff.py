@@ -53,7 +53,7 @@ def refseq(inFilepath, outFilepath):
         addCol_dct = {"ID": "{}({})".format(row["family"],row["orf_id"])}
         att_lst.append(format_attribute(row["attribute"], delCol_lst = delCol_lst, addCol_dct = addCol_dct))
     refseq_df["attribute"]=att_lst
-    write_gff(outFilepath, refseq_df)
+    write_gff(refseq_df, outFilepath)
     
 def prodigal(inFilepath, outFilepath):
     """
