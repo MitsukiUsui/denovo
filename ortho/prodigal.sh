@@ -15,6 +15,7 @@ seqFilepath=`echo ${line} | cut -d ',' -f1`
 gffFilepath=`echo ${line} | cut -d ',' -f2`
 fnaFilepath=`echo ${line} | cut -d ',' -f3`
 faaFilepath=`echo ${line} | cut -d ',' -f4`
+supFilepath=`echo ${line} | cut -d ',' -f5`
 
 OUT=./log/prodigal_${JOB_ID}_${SGE_TASK_ID}.out
 ERR=./log/prodigal_${JOB_ID}_${SGE_TASK_ID}.err
@@ -22,7 +23,8 @@ ERR=./log/prodigal_${JOB_ID}_${SGE_TASK_ID}.err
 prodigal -i ${seqFilepath} \
          -o ${gffFilepath} -f gff \
          -d ${fnaFilepath} \
-         -a ${faaFilepath} 1>>${OUT} 2>>${ERR}
+         -a ${faaFilepath} \
+         -s ${supFilepath} 1>>${OUT} 2>>${ERR}
 
 ./prodigal_post.py ${gffFilepath} 1>>${OUT} 2>>${ERR}
 

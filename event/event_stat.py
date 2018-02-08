@@ -6,6 +6,11 @@ import numpy as np
 from ete3 import Tree
 
 class EventStat:
+    """
+    class to calcurate distance between to ortholog family
+    EventStat is not appropriate name then
+    """
+    
     def __init__(self, target):
         self.strain_lst = self.get_strain_lst(target)
         self.cluster_df = self.get_cluster_df(target)
