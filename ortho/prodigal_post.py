@@ -19,7 +19,7 @@ def main(inFilepath, outFilepath):
         att = "{};orf_id={}".format(row["attribute"], orfId)
         attribute_lst.append(att)
     gff_df["attribute"]=attribute_lst
-    write_gff(outFilepath, gff_df)
+    write_gff(gff_df, outFilepath)
     print("DONE: output {}".format(outFilepath))
     
 if __name__=="__main__":
