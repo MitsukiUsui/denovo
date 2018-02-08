@@ -18,3 +18,5 @@ rm -rf ${sonicDirec}
 sonicparanoid.py  -i ${sonicDirec}/in -o ${sonicDirec}/out -t 20
 ./sonic_post.py ${target} ${annotType}
 ./format_gff.py ${target} ${annotType}
+./distribute_family.py ${target}
+./igv_gff.py ${target}

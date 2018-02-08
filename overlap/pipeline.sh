@@ -1,6 +1,9 @@
 #!/bin/bash
 
 target=${1}
+statusFilename=${2}
+if [ -z ${statusFilename+x} ]; then statusFilename=.STATUS; fi;
+
 cmd=overlap.sh
 argCmd=./arg/${cmd%.*}.py
 argFilepath=${argCmd%.*}.lst
@@ -22,5 +25,5 @@ echo "submitted ${numJobs} jobs with job_id=${jobId}, dependency=${prevJobId}"
 cmd=checker.sh
 numJobs=1
 prevJobId=${jobId}
-jobId=`qsub -terse -hold_jid ${prevJobId} ${cmd} ${target}`
+jobId=`qsub -terse -hold_jid ${prevJobId} ${cmd} ${target} ${statusFilename}`
 echo "submitted checker with job_id=${jobId}, dependency=${prevJobId}"

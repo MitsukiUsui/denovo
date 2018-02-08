@@ -1,6 +1,8 @@
 #!/bin/bash
 
 target=${1}
+statusFilename=${2}
+if [ -z ${statusFilename+x} ]; then statusFilename=.STATUS; fi;
 
 ./create_database.sh ${target}
 ./myphylophlan.sh ${target}
@@ -19,6 +21,6 @@ echo "submitted ${numJobs} jobs with job_id=${jobId}"
 cmd=checker.sh
 numJobs=1
 prevJobId=${jobId}
-jobId=`qsub -terse -hold_jid ${prevJobId} ${cmd} ${target}`
+jobId=`qsub -terse -hold_jid ${prevJobId} ${cmd} ${target} ${statusFilename}`
 echo "submitted checker with job_id=${jobId}, dependency=${prevJobId}"
 

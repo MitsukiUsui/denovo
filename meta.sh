@@ -1,8 +1,11 @@
 #!/bin/bash
 
+MYVERSION="ver1.1"
+TIMESTAMP=`date +%s`
+DATE=`date -d @${TIMESTAMP}`
+
 target=${1}
-annotType=refseq
-statusFilepath=.STATUS
+statusFilename=.${TIMESTAMP}
 
 waitfor() {
     filepath=${1}
@@ -17,14 +20,17 @@ waitfor() {
     done
 }
 
-echo "START: meta-pipeline for ${target},${annotType}"
+echo "START: meta-pipeline for ${target} @${TIMESTAMP}"
 
-#step=download
-#echo "START: ${step}"
-#cd ./${step}
-#./pipeline.sh ${target}
-#../
-#echo "DONE: ${step}"
+#--------------------------------------------------------------------------------
+# STEP0. download data
+#--------------------------------------------------------------------------------
+step=download
+echo "START: ${step}"
+cd ./${step}
+./pipeline.sh ${target}
+cd ../
+echo "DONE: ${step}"
 
 #--------------------------------------------------------------------------------
 # STEP1. ortholog clustering
@@ -32,13 +38,13 @@ echo "START: meta-pipeline for ${target},${annotType}"
 step=ortho
 echo "START: ${step}"
 cd ./${step}
-rm ${statusFilepath}
-./pipeline.sh ${target} ${annotType}
+./pipeline.sh ${target} ${statusFilename}
 
-waitfor ${statusFilepath}
-status=`cat ${statusFilepath}`
+waitfor ${statusFilename}
+status=`cat ${statusFilename}`
 if [ ${status} -eq 0 ]; then
     echo "DONE: ${step}"
+    rm ${statusFilename}
     cd ../
 else
     echo "ERROR: in ${step}"
@@ -51,13 +57,13 @@ fi
 step=blastn
 echo "START: ${step}"
 cd ./${step}
-rm ${statusFilepath}
-./pipeline.sh ${target} ${annotType}
+./pipeline.sh ${target} ${statusFilename}
 
-waitfor ${statusFilepath}
-status=`cat ${statusFilepath}`
+waitfor ${statusFilename}
+status=`cat ${statusFilename}`
 if [ ${status} -eq 0 ]; then
     echo "DONE: ${step}"
+    rm ${statusFilename}
     cd ../
 else
     echo "ERROR: in ${step}"
@@ -80,13 +86,13 @@ echo "DONE: ${step}"
 step=overlap
 echo "START: ${step}"
 cd ./${step}
-rm ${statusFilepath}
-./pipeline.sh ${target}
+./pipeline.sh ${target} ${statusFilename}
 
-waitfor ${statusFilepath}
-status=`cat ${statusFilepath}`
+waitfor ${statusFilename}
+status=`cat ${statusFilename}`
 if [ ${status} -eq 0 ]; then
     echo "DONE ${step}"
+    rm ${statusFilename}
     cd ../
 else
     echo "ERROR in ${step}"
@@ -94,3 +100,4 @@ else
 fi
 
 echo "DONE: all steps successfully"
+echo "${target},${MYVERSION},${TIMESTAMP},${DATE}" >> record.txt
