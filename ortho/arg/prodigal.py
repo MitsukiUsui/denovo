@@ -10,6 +10,7 @@ for strain in strain_lst:
     gffFilepath="{}/annotation/prodigal/gff/{}.gff".format(baseDirec, strain)
     fnaFilepath="{}/annotation/prodigal/fna/{}.fna".format(baseDirec, strain)
     faaFilepath="{}/annotation/prodigal/faa/{}.faa".format(baseDirec, strain)
-    print("{},{},{},{}".format(seqFilepath, gffFilepath, fnaFilepath, faaFilepath))
+    supFilepath="{}/annotation/prodigal/sup/{}.sup".format(baseDirec, strain)
+    print("{},{},{},{},{}".format(seqFilepath, gffFilepath, fnaFilepath, faaFilepath, supFilepath))
 
 
