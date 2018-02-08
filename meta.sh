@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MYVERSION="ver1.1"
+MYVERSION="ver1.2"
 TIMESTAMP=`date +%s`
 DATE=`date -d @${TIMESTAMP}`
 

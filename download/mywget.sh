@@ -7,3 +7,4 @@ do
     wget --quiet -O - ${ftpFilepath} | gunzip -c > ${outFilepath}
     echo -e "\tDONE: ${outFilepath}"
 done<${argFilepath}
+

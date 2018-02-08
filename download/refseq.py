@@ -139,7 +139,7 @@ def main(target, basename, genomeId):
     edit_dnaseq(infp["dnaseq"], outfp["dnaseq"], genomeId)
     print("DONE: output to {}".format(outfp["dnaseq"]))
     
-    gff_df = read_gff(infp["gff"], ["ID","Parent", "locus_tag", "protein_id", "pseudo"])
+    gff_df = read_gff(infp["gff"], ["ID", "Parent", "locus_tag", "protein_id", "pseudo"])
     gff_df = set_orfId(gff_df)
     lookup_df=get_lookup_df(gff_df)
     
