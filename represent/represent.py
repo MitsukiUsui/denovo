@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
 
 import sys
+import pandas as pd
 import numpy as np
-from ete3 import Tree
 
 sys.path.append("../helper")
-from myio import get_strain_lst, get_distance_mat
+from myio import *
 
-def main(target):
-    strain_lst = get_strain_lst(target)
+def main(target, catalogFilepath):
+    catalog_df = pd.read_csv(catalogFilepath, sep="\t")
+    strain_lst = list(catalog_df["genome_id"])
 
     # filter strain greedy
-    distance_mat = get_distance_mat(target)
+    distance_mat = get_distance_mat(target, full = True)
+    assert distance_mat.shape[0] == len(strain_lst)
+    
     thres = 0.5
     msk = np.ones(len(strain_lst)).astype(bool)
     for i in range(len(strain_lst)):
@@ -19,15 +22,13 @@ def main(target):
             for j in range(i + 1, len(strain_lst)):
                 if distance_mat[i][j] < thres:
                     msk[j] = False
-    print("DONE: filter to {} from {} strains".format(msk.sum(), len(msk)))
+    print("DONE: select representative {}/{} strains".format(msk.sum(), len(msk)))
     
-    outFilepath = "../data/{}/strain.fil.lst".format(target)
-    with open(outFilepath, "w") as f:
-        for i in range(len(strain_lst)):
-            if msk[i]:
-                f.write("{}\n".format(strain_lst[i]))
-    print("DONE: output {}".format(outFilepath))
+    catalog_df["represent"] = msk.astype(int)
+    catalog_df.to_csv(catalogFilepath, index = False, sep = "\t")
+    print("DONE: update {}".format(catalogFilepath))
 
 if __name__=="__main__":
     target = sys.argv[1]
-    main(target)
+    catalogFilepath = "../data/{}/catalog.tsv".format(target)
+    main(target, catalogFilepath)

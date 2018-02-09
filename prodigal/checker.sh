@@ -9,7 +9,7 @@
 #$ -l mem_free=5G
 
 target=${1}
-statusFilename=.STATUS
+statusFilename=${2}
 ./checker.py ${target}
 echo $?> ${statusFilename}
 

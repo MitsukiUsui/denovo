@@ -99,8 +99,10 @@ def set_orfId(gff_df):
     return gff_df
 
 def get_lookup_df(gff_df): 
-    for col in ["ID","Parent", "locus_tag", "protein_id", "pseudo"]:
+    for col in ["ID","Parent", "locus_tag", "protein_id"]:
         assert col in gff_df.columns
+    if "pseudo" not in gff_df.columns:
+        gff_df["pseudo"] = False
     
     gene2loc={} # given gene_id, return locus_tag
     dct_lst=[]

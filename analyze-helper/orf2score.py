@@ -2,10 +2,10 @@
 
 import sys
 import pandas as pd
-from ScoreDbController import ScoreDbController
 
 sys.path.append("../helper")
 from gff import read_gff
+from ScoreDbController import ScoreDbController
 
 def main(target, strain_lst):
     print("START: query about {} strains".format(len(strain_lst)))

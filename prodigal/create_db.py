@@ -4,6 +4,8 @@ import sys
 import re
 import pandas as pd
 from io import StringIO
+
+sys.path.append("../helper")
 from ScoreDbController import ScoreDbController
 
 class ProdigalScore:

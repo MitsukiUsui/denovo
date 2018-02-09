@@ -13,6 +13,7 @@ import sys
 
 sys.path.append("../helper")
 from gff import read_gff, write_gff
+from myio import get_strain_lst
 
 def main(strain, clusterFilepath, inFilepath, outFilepath):
     cluster_df=pd.read_csv(clusterFilepath, delimiter="\t")
@@ -44,8 +45,7 @@ if __name__=="__main__":
     target=sys.argv[1]
     annType=sys.argv[2]
     clusterFilepath="../data/{}/cluster.tsv".format(target)    
-    strainFilepath="../data/{}/strain.lst".format(target)
-    strain_lst=[s.strip() for s in open(strainFilepath, 'r').readlines()]
+    strain_lst = get_strain_lst(target)
     for strain in strain_lst:
         inFilepath="/data/mitsuki/data/denovo/{}/annotation/{}/gff/{}.gff".format(target, annType, strain)
         outFilepath = inFilepath 

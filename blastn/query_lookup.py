@@ -6,11 +6,15 @@ import numpy as np
 import re
 import sys
 
-def main(clusterFilepath, strainFilepath, phbFilepath, outFilepath):
-    cluster_df=pd.read_csv(clusterFilepath, delimiter='\t', dtype="object")
-    strain_lst=[s.strip() for s in open(strainFilepath, 'r').readlines()]
-    t=Tree(phbFilepath)
-  
+sys.path.append("../helper")
+from myio import *
+
+def main(phbFilepath, outFilepath):
+    cluster_df = get_cluster_df(target)
+    strain_lst = get_strain_lst(target)
+    t = Tree(phbFilepath)
+ 
+    distance_mat = get_distance_mat(target)
     print("START: calc distance matrix between {} strain".format(len(strain_lst)))
     distance_mat=-np.ones((len(strain_lst), len(strain_lst)))
     for i, node1 in enumerate(strain_lst):

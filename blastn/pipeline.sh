@@ -5,7 +5,6 @@ statusFilename=${2}
 if [ -z ${statusFilename+x} ]; then statusFilename=.STATUS; fi;
 
 ./create_database.sh ${target}
-./myphylophlan.sh ${target}
 ./query_lookup.py ${target}
 ./create_query.py ${target}
 

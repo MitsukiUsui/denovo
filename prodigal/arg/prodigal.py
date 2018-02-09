@@ -13,4 +13,3 @@ for strain in strain_lst:
     supFilepath="{}/annotation/prodigal/sup/{}.sup".format(baseDirec, strain)
     print("{},{},{},{},{}".format(seqFilepath, gffFilepath, fnaFilepath, faaFilepath, supFilepath))
 
-
