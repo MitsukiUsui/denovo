@@ -16,6 +16,7 @@ fi
 # create symbolic link in input directory
 phyloDirec=/home/mitsuki/software/phylophlan
 mkdir -p ${phyloDirec}/input/${target}
+
 catalogFilepath=${dataDirec}/catalog.tsv
 cut -f1 ${catalogFilepath} | tail -n +2 | while read strain
 do
@@ -27,7 +28,7 @@ done
 
 # run
 cd ${phyloDirec}
-./phylophlan.py -u ${target} --nproc 10 1>/dev/null 2>/dev/null
+./phylophlan.py -u ${target} --nproc 10 #1>/dev/null 2>/dev/null
 
 # create link for newick
 nwkFilepath=${phyloDirec}/output/${target}/${target}.tree.nwk

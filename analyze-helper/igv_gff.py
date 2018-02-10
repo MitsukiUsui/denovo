@@ -5,6 +5,7 @@ import os
 sys.path.append("../helper")
 from gff import read_gff, write_gff
 from myutil.myutil import myrun
+from myio import get_strain_lst
 
 def format_attribute(att_str, delCol_lst = None, addCol_dct = None):
     """
@@ -79,9 +80,6 @@ def main(target, strain_lst):
 
 if __name__=="__main__":
     target=sys.argv[1]
-    strainFilepath="../data/{}/strain.lst".format(target)
-    strain_lst=[s.strip() for s in open(strainFilepath, 'r').readlines()]
+    strain_lst = get_strain_lst(target)
     main(target, strain_lst)
 
-    
-    

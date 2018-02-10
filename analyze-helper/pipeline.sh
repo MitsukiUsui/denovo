@@ -3,6 +3,6 @@
 target=${1}
 statusFilename=${2:-.STATUS}
 
-./myphylophlan.sh ${target}
-./represent.py ${target} 0.05
+./igv_gff.py ${target}
+./score.sh ${target}
 echo 0 > ${statusFilename}
