@@ -1,4 +1,5 @@
 #!/bin/bash
+set -u
 
 MYVERSION="ver1.2"
 TIMESTAMP=`date +%s`
@@ -15,98 +16,43 @@ waitfor() {
         then
             break
         fi
-#        echo "WAIT: for ${filepath}"
         sleep 1m
     done
 }
 
+myrun() {
+    # require pipeline.sh & corresponting checker.sh mechanism
+    
+    step=${1}
+   
+    echo ""
+    echo "START: ${step}"
+    cd ./${step}
+    ./pipeline.sh ${target} ${statusFilename}
+
+    echo "WAIT: ${statusFilename}"
+    waitfor ${statusFilename}
+    status=`cat ${statusFilename}`
+    if [ ${status} -eq 0 ]; then
+        echo "DONE: ${step}"
+        rm ${statusFilename}
+        cd ../
+    else
+        echo "ERROR: in ${step}"
+        exit ${status}
+    fi
+}
+
 echo "START: meta-pipeline for ${target} @${TIMESTAMP}"
 
-#--------------------------------------------------------------------------------
-# STEP0. download data
-#--------------------------------------------------------------------------------
-step=download
-echo "START: ${step}"
-cd ./${step}
-./pipeline.sh ${target}
-
-waitfor ${statusFilename}
-status=`cat ${statusFilename}`
-if [ ${status} -eq 0 ]; then
-    echo "DONE: ${step}"
-    rm ${statusFilename}
-    cd ../
-else
-    echo "ERROR: in ${step}"
-    exit ${status}
-fi
-
-#--------------------------------------------------------------------------------
-# STEP1. ortholog clustering
-#--------------------------------------------------------------------------------
-step=ortho
-echo "START: ${step}"
-cd ./${step}
-./pipeline.sh ${target} ${statusFilename}
-
-waitfor ${statusFilename}
-status=`cat ${statusFilename}`
-if [ ${status} -eq 0 ]; then
-    echo "DONE: ${step}"
-    rm ${statusFilename}
-    cd ../
-else
-    echo "ERROR: in ${step}"
-    exit ${status}
-fi
-
-#--------------------------------------------------------------------------------
-# STEP2. BLASTN
-#--------------------------------------------------------------------------------
-step=blastn
-echo "START: ${step}"
-cd ./${step}
-./pipeline.sh ${target} ${statusFilename}
-
-waitfor ${statusFilename}
-status=`cat ${statusFilename}`
-if [ ${status} -eq 0 ]; then
-    echo "DONE: ${step}"
-    rm ${statusFilename}
-    cd ../
-else
-    echo "ERROR: in ${step}"
-    exit ${status}
-fi
-
-#--------------------------------------------------------------------------------
-# STEP3. calculate synteny relationship
-#--------------------------------------------------------------------------------
-step=synteny
-echo "START: ${step}"
-cd ./${step}
-./synteny.py ${target}
-cd ../
-echo "DONE: ${step}"
-
-#--------------------------------------------------------------------------------
-# STEP4. calculate DNA/Protein alignment score for overlap 
-#--------------------------------------------------------------------------------
-step=overlap
-echo "START: ${step}"
-cd ./${step}
-./pipeline.sh ${target} ${statusFilename}
-
-waitfor ${statusFilename}
-status=`cat ${statusFilename}`
-if [ ${status} -eq 0 ]; then
-    echo "DONE ${step}"
-    rm ${statusFilename}
-    cd ../
-else
-    echo "ERROR in ${step}"
-    exit ${status}
-fi
+#myrun download
+myrun represent
+myrun prodigal
+myrun ortho
+myrun blastn
+myrun synteny
+myrun overlap
+myrun analyze-helper
 
 echo "DONE: all steps successfully"
 echo "${target},${MYVERSION},${TIMESTAMP},${DATE}" >> record.txt

@@ -3,12 +3,12 @@
 import sys
 import pandas as pd
 
+sys.path.append("../helper")
+from myio import get_strain_lst, get_cluster_df
+
 def core(target, family):
-    baseDirec = "/home/mitsuki/altorf/denovo"
-    strainFilepath="{}/data/{}/strain.lst".format(baseDirec, target)
-    strain_lst=[s.strip() for s in open(strainFilepath, 'r').readlines()]
-    clusterFilepath="{}/data/{}/cluster.tsv".format(baseDirec, target)
-    cluster_df=pd.read_csv(clusterFilepath, sep="\t")
+    strain_lst = get_strain_lst(target)
+    cluster_df = get_cluster_df(target)
     family_series = cluster_df[cluster_df["family"]==family][strain_lst].dropna(axis=1).iloc[0]
     return family_series
 

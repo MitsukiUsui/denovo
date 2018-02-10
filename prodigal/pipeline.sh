@@ -37,5 +37,5 @@ echo "submitted ${numJobs} jobs with job_id=${jobId}, dependency=${prevJobId}"
 cmd=checker.sh
 numJobs=1
 prevJobId=${jobId}
-jobId=`qsub -terse -hold_jid ${prevJobId} ${cmd} ${target}`${statusFilepath}
+jobId=`qsub -terse -hold_jid ${prevJobId} ${cmd} ${target} ${statusFilename}`
 echo "submitted ${numJobs} jobs with job_id=${jobId}, dependency=${prevJobId}"

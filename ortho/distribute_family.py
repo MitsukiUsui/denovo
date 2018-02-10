@@ -18,15 +18,15 @@ def output_family2rec(family2rec, outDirec, ext):
 
 def main(target, strain_lst):
     annotType="refseq"
-    prodigalDirec="/data/mitsuki/data/denovo/{}/annotation/{}".format(target, annotType)
+    direc="/data/mitsuki/data/denovo/{}/annotation/{}".format(target, annotType)
     
     print("START: parse {} * 2 FASTA files".format(len(strain_lst)))
     family2fna=defaultdict(list)
     family2faa=defaultdict(list)
     for strain in strain_lst:
-        gffFilepath="{}/gff/{}.gff".format(prodigalDirec, strain)
-        fnaFilepath="{}/fna/{}.fna".format(prodigalDirec, strain)
-        faaFilepath="{}/faa/{}.faa".format(prodigalDirec, strain)
+        gffFilepath="{}/gff/{}.gff".format(direc, strain)
+        fnaFilepath="{}/fna/{}.fna".format(direc, strain)
+        faaFilepath="{}/faa/{}.faa".format(direc, strain)
 
         gff_df=read_gff(gffFilepath, ["orf_id","family"])
         id2family={}
@@ -42,12 +42,12 @@ def main(target, strain_lst):
             family2faa[family].append(rec)
 
     print("START: output fna & faa for every family")
-    outDirec="{}/family/fna".format(prodigalDirec)
+    outDirec="{}/family/fna".format(direc)
     os.makedirs(outDirec, exist_ok=True)
     output_family2rec(family2fna, outDirec, "fna")
     print("\tDONE: output {} family in {}".format(len(family2fna), outDirec))
 
-    outDirec="{}/family/faa".format(prodigalDirec)
+    outDirec="{}/family/faa".format(direc)
     os.makedirs(outDirec, exist_ok=True)
     output_family2rec(family2faa, outDirec, "faa")
     print("\tDONE: output {} family in {}".format(len(family2faa), outDirec))
