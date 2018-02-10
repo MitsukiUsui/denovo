@@ -9,18 +9,10 @@ import sys
 sys.path.append("../helper")
 from myio import *
 
-def main(phbFilepath, outFilepath):
-    cluster_df = get_cluster_df(target)
+def main(target, outFilepath):
     strain_lst = get_strain_lst(target)
-    t = Tree(phbFilepath)
- 
+    cluster_df = get_cluster_df(target)
     distance_mat = get_distance_mat(target)
-    print("START: calc distance matrix between {} strain".format(len(strain_lst)))
-    distance_mat=-np.ones((len(strain_lst), len(strain_lst)))
-    for i, node1 in enumerate(strain_lst):
-        for j, node2 in enumerate(strain_lst):
-            if i!=j:
-                distance_mat[i,j]=t.get_distance(node1, node2)
 
     print("START: create query lookup table".format(len(strain_lst)))
     dct_lst=[]
@@ -47,10 +39,5 @@ def main(phbFilepath, outFilepath):
 
 if __name__=="__main__":
     target=sys.argv[1]
-    direc="../data/{}".format(target)
-    
-    clusterFilepath="{}/cluster.tsv".format(direc)
-    strainFilepath="{}/strain.lst".format(direc)
-    phbFilepath="{}/cluster.phb".format(direc)
-    outFilepath="{}/query_lookup.csv".format(direc)
-    main(clusterFilepath, strainFilepath, phbFilepath, outFilepath)
+    outFilepath="../data/{}/query_lookup.csv".format(target)
+    main(target, outFilepath)

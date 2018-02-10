@@ -7,7 +7,7 @@ import numpy as np
 sys.path.append("../helper")
 from myio import *
 
-def main(target, catalogFilepath):
+def main(target, thres, catalogFilepath):
     catalog_df = pd.read_csv(catalogFilepath, sep="\t")
     strain_lst = list(catalog_df["genome_id"])
 
@@ -15,7 +15,6 @@ def main(target, catalogFilepath):
     distance_mat = get_distance_mat(target, full = True)
     assert distance_mat.shape[0] == len(strain_lst)
     
-    thres = 0.5
     msk = np.ones(len(strain_lst)).astype(bool)
     for i in range(len(strain_lst)):
         if msk[i]:
@@ -30,5 +29,6 @@ def main(target, catalogFilepath):
 
 if __name__=="__main__":
     target = sys.argv[1]
+    thres = float(sys.argv[2])
     catalogFilepath = "../data/{}/catalog.tsv".format(target)
-    main(target, catalogFilepath)
+    main(target, thres, catalogFilepath)

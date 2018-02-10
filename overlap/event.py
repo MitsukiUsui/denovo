@@ -10,16 +10,7 @@ sys.path.append("../synteny")
 from synteny import calc_inter_synteny
 sys.path.append("../helper")
 from phase import PhaseController
-
-def get_strain_lst(target):
-    strainFilepath="../data/{}/strain.lst".format(target)
-    strain_lst=[s.strip() for s in open(strainFilepath, 'r').readlines()]
-    return strain_lst
-
-def get_cluster_df(target):
-    clusterFilepath="../data/{}/cluster.tsv".format(target)
-    cluster_df=pd.read_csv(clusterFilepath, sep="\t", dtype="object")
-    return cluster_df
+from myio import get_strain_lst, get_cluster_df
 
 def get_synteny_df(target):
     syntenyFilepath="../data/{}/synteny.tsv".format(target)

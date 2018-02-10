@@ -1,8 +1,7 @@
 #!/bin/bash
 
 target=${1}
-statusFilename=${2}
-if [ -z ${statusFilename+x} ]; then statusFilename=.STATUS; fi;
+statusFilename=${2:-.STATUS}
 
 ./create_database.sh ${target}
 ./query_lookup.py ${target}

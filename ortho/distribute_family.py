@@ -7,6 +7,7 @@ from collections import defaultdict
 
 sys.path.append("../helper")
 from gff import read_gff
+from myio import *
 
 def output_family2rec(family2rec, outDirec, ext):
     for family, rec_lst in family2rec.items():
@@ -53,6 +54,5 @@ def main(target, strain_lst):
 
 if __name__=="__main__":
     target=sys.argv[1]
-    strainFilepath="../data/{}/strain.lst".format(target)
-    strain_lst=[s.strip() for s in open(strainFilepath, 'r').readlines()]
+    strain_lst = get_strain_lst(target)
     main(target, strain_lst)

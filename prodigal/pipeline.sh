@@ -1,7 +1,7 @@
 #!/bin/bash
 
 target=${1}
-statusFilename=.STATUS
+statusFilename=${2:-.STATUS}
 baseDirec=/data/mitsuki/data/denovo/${target}
 
 #--------------------------------------------------------------------------------

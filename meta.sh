@@ -29,8 +29,17 @@ step=download
 echo "START: ${step}"
 cd ./${step}
 ./pipeline.sh ${target}
-cd ../
-echo "DONE: ${step}"
+
+waitfor ${statusFilename}
+status=`cat ${statusFilename}`
+if [ ${status} -eq 0 ]; then
+    echo "DONE: ${step}"
+    rm ${statusFilename}
+    cd ../
+else
+    echo "ERROR: in ${step}"
+    exit ${status}
+fi
 
 #--------------------------------------------------------------------------------
 # STEP1. ortholog clustering

@@ -6,12 +6,15 @@ import math
 import pandas as pd
 import numpy as np
 
-def main(target, orf2scoreFilepath, clusterFilepath, strainFilepath):
-    orf2score_df = pd.read_csv(orf2scoreFilepath)
-    cluster_df=pd.read_csv(clusterFilepath, delimiter='\t', dtype="object")
-    strain_lst=[s.strip() for s in open(strainFilepath, 'r').readlines()]
+sys.path.append("../helper")
+from myio import *
+
+def main(target, orfFilepath, familyFilepath):
+    orf2score_df = pd.read_csv(orfFilepath)
+    cluster_df = get_cluster_df(target)
+    strain_lst = get_strain_lst(target)
     
-    print("START: load {}".format(orf2scoreFilepath))
+    print("START: load {}".format(orfFilepath))
     orf2score={}
     for orf, score in zip(orf2score_df["orf_id"], orf2score_df["Total"]):
         orf2score[orf]=score
@@ -38,14 +41,12 @@ def main(target, orf2scoreFilepath, clusterFilepath, strainFilepath):
         
     family2score_df = pd.DataFrame(dct_lst)
     family2score_df = family2score_df[["family", "ave_score", "score_count"]]
-    outFilepath="../data/{}/family2score.csv".format(target)
-    family2score_df.to_csv(outFilepath, index=False)
-    print("DONE: output {}".format(outFilepath))
+    family2score_df.to_csv(familyFilepath, index=False)
+    print("DONE: output {}".format(familyFilepath))
 
 if __name__=="__main__":
     target = sys.argv[1]
-    orf2scoreFilepath="../data/{}/orf2score.csv".format(target)
-    clusterFilepath="../data/{}/cluster.tsv".format(target)
-    strainFilepath="../data/{}/strain.lst".format(target)
-    main(target, orf2scoreFilepath, clusterFilepath, strainFilepath)
+    orfFilepath="../data/{}/orf2score.csv".format(target)
+    familyFilepath="../data/{}/family2score.csv".format(target)
+    main(target, orfFilepath, familyFilepath)
     
