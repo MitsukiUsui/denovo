@@ -5,6 +5,9 @@ import os
 import pandas as pd
 from Bio import SeqIO
 
+sys.path.append("../helper")
+from myio import *
+
 def output_query(ext, strain_lst, lookup_df):
     annotationType = "refseq"
 
@@ -25,11 +28,10 @@ def output_query(ext, strain_lst, lookup_df):
         print("\tDONE: output {}".format(outFilepath))
     
 
-def main(target, lookupFilepath, strainFilepath):
-    lookup_df=pd.read_csv(lookupFilepath)
-    strain_lst=[s.strip() for s in open(strainFilepath, 'r').readlines()]
+def main(target, lookupFilepath, outDirec):
+    lookup_df = pd.read_csv(lookupFilepath)
+    strain_lst = get_strain_lst(target)
     
-    outDirec = "./query/{}".format(target)
     os.makedirs(outDirec, exist_ok=True)
     output_query("fna", strain_lst, lookup_df)
     output_query("faa", strain_lst, lookup_df)
@@ -37,5 +39,5 @@ def main(target, lookupFilepath, strainFilepath):
 if __name__=="__main__":
     target=sys.argv[1]
     lookupFilepath="../data/{}/query_lookup.csv".format(target)
-    strainFilepath="../data/{}/strain.lst".format(target)
-    main(target, lookupFilepath, strainFilepath)
+    outDirec = "./query/{}".format(target)
+    main(target, lookupFilepath, outDirec)

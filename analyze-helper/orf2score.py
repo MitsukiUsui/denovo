@@ -2,10 +2,11 @@
 
 import sys
 import pandas as pd
-from ScoreDbController import ScoreDbController
 
 sys.path.append("../helper")
 from gff import read_gff
+from myio import *
+from ScoreDbController import ScoreDbController
 
 def main(target, strain_lst):
     print("START: query about {} strains".format(len(strain_lst)))
@@ -34,6 +35,5 @@ def main(target, strain_lst):
 
 if __name__=="__main__":
     target = sys.argv[1]
-    strainFilepath="../data/{}/strain.lst".format(target)
-    strain_lst=[s.strip() for s in open(strainFilepath, 'r').readlines()]
+    strain_lst = get_strain_lst(target)
     main(target, strain_lst)

@@ -10,6 +10,9 @@ import pandas as pd
 import numpy as np
 from Bio import SeqIO
 
+sys.path.append("../helper")
+from myio import get_strain_lst
+
 def find_no_ortho(seqFilepath, sonic_srs):
     # get list of orf_id first
     orfId_lst=[]
@@ -87,6 +90,5 @@ if __name__=="__main__":
     annotType=sys.argv[2]
     sonicDirec="/data/mitsuki/data/denovo/{}/annotation/{}/sonic".format(target, annotType)
     outFilepath="../data/{}/cluster.tsv".format(target)
-    strainFilepath="../data/{}/strain.lst".format(target)
-    strain_lst=[s.strip() for s in open(strainFilepath, 'r').readlines()]
+    strain_lst = get_strain_lst(target)
     main(sonicDirec, outFilepath, strain_lst)

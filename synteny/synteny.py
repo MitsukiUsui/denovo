@@ -6,6 +6,7 @@ from collections import Counter
 
 sys.path.append("../helper")
 from gff import read_gff
+from myio import *
 
 def calc_synteny(neighbor_lst):
     c=Counter(neighbor_lst)
@@ -99,9 +100,9 @@ def get_synteny_df(cluster_df, orf2synteny, strain_lst):
     return syn_df
     
 
-def main(target, strainFilepath, clusterFilepath, outFilepath):
-    strain_lst=[s.strip() for s in open(strainFilepath, 'r').readlines()]
-    cluster_df=pd.read_csv(clusterFilepath, delimiter="\t")
+def main(target, outFilepath):
+    strain_lst = get_strain_lst(target)
+    cluster_df = get_cluster_df(target)
     annotationType="refseq"
     
     gffDirec="/data/mitsuki/data/denovo/{}/annotation/{}/gff".format(target, annotationType)
@@ -114,7 +115,6 @@ def main(target, strainFilepath, clusterFilepath, outFilepath):
 
 if __name__=="__main__":
     target=sys.argv[1]
-    strainFilepath="../data/{}/strain.lst".format(target)
-    clusterFilepath="../data/{}/cluster.tsv".format(target)
     outFilepath = "../data/{}/synteny.tsv".format(target)
-    main(target,  strainFilepath, clusterFilepath, outFilepath)
+    main(target, outFilepath)
+

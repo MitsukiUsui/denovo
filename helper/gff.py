@@ -1,3 +1,4 @@
+import sys
 import pandas as pd
 from io import StringIO
 
@@ -25,7 +26,7 @@ def read_gff(gffFilepath, additional_lst=None):
             try:
                 gff_df[col] = att_df[col]
             except KeyError:
-                print("ERROR: {} does not contain information on {}".format(gffFilepath, col))
+                print("ERROR: {} does not contain information on {}".format(gffFilepath, col), file = sys.stderr)
     return gff_df
 
 def write_gff(gff_df, outFilepath):

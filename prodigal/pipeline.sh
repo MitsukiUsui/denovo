@@ -2,43 +2,40 @@
 
 target=${1}
 statusFilename=${2:-.STATUS}
+baseDirec=/data/mitsuki/data/denovo/${target}
 
 #--------------------------------------------------------------------------------
-# download from RefSeq-ftp and store
+# annotation by prodigal
 #--------------------------------------------------------------------------------
-cmd=mywget.sh
+mkdir -p ${baseDirec}/annotation/prodigal/gff
+mkdir -p ${baseDirec}/annotation/prodigal/fna
+mkdir -p ${baseDirec}/annotation/prodigal/faa
+mkdir -p ${baseDirec}/annotation/prodigal/sup
+
+cmd=prodigal.sh
 argCmd=./arg/${cmd%.*}.py
 argFilepath=${argCmd%.*}.lst
 eval ${argCmd} ${target} > ${argFilepath}
 numJobs=`grep -c '' ${argFilepath}`
-jobId_r=`qsub -terse -t 1-${numJobs} -tc 10 ${cmd} ${argFilepath}`
+jobId_r=`qsub -terse -t 1-${numJobs} ${cmd} ${argFilepath}`
 jobId=`echo ${jobId_r} | cut -d '.' -f1`
 echo "submitted ${numJobs} jobs with job_id=${jobId}"
 
 #--------------------------------------------------------------------------------
-# format refseq annotation information
+# create SQLite database from sup
 #--------------------------------------------------------------------------------
-baseDirec=/data/mitsuki/data/denovo/${target}
-mkdir -p ${baseDirec}/dnaseq
-mkdir -p ${baseDirec}/annotation/refseq/gff
-mkdir -p ${baseDirec}/annotation/refseq/fna
-mkdir -p ${baseDirec}/annotation/refseq/faa
-
-cmd=refseq.sh
+cmd=create_db.sh
 argCmd=./arg/${cmd%.*}.py
 argFilepath=${argCmd%.*}.lst
 eval ${argCmd} ${target} > ${argFilepath}
 numJobs=`grep -c '' ${argFilepath}`
 prevJobId=${jobId}
-jobId_r=`qsub -terse -hold_jid ${prevJobId} -t 1-${numJobs} ${cmd} ${argFilepath}`
+jobId_r=`qsub -terse -t 1-${numJobs} -hold_jid ${prevJobId} ${cmd} ${argFilepath}`
 jobId=`echo ${jobId_r} | cut -d '.' -f1`
 echo "submitted ${numJobs} jobs with job_id=${jobId}, dependency=${prevJobId}"
 
-#--------------------------------------------------------------------------------
-# checker
-#--------------------------------------------------------------------------------
 cmd=checker.sh
 numJobs=1
 prevJobId=${jobId}
-jobId=`qsub -terse -hold_jid ${prevJobId} ${cmd} ${target} ${statusFilename}`
-echo "submitted checker with job_id=${jobId}, dependency=${prevJobId}"
+jobId=`qsub -terse -hold_jid ${prevJobId} ${cmd} ${target}`${statusFilepath}
+echo "submitted ${numJobs} jobs with job_id=${jobId}, dependency=${prevJobId}"

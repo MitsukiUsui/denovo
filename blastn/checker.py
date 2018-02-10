@@ -3,9 +3,11 @@
 import sys
 import pandas as pd
 
-target=sys.argv[1]
-strainFilepath="../data/{}/strain.lst".format(target)
-strain_lst=[s.strip() for s in open(strainFilepath, 'r').readlines()]
+sys.path.append("../helper")
+from myio import *
+
+target = sys.argv[1]
+strain_lst = get_strain_lst(target)
 
 # check result
 for strain in strain_lst:
