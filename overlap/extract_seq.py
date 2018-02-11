@@ -18,9 +18,9 @@ def main(target, ovrFilepath, seqFilepath, orf2fna, orf2faa):
     with open(seqFilepath, 'w') as f:
         for key,row in overlap_df.iterrows():
             if (row["sorf_id"] not in orf2fna) or (row["sorf_id"] not in orf2faa):
-                print("ERROR: {} does not have sequence information".format(row["sorf_id"]))
+                print("ERROR: {} does not have sequence information".format(row["sorf_id"]), file = sys.stderr)
             elif (row["qorf_id"] not in orf2fna) or (row["qorf_id"] not in orf2faa):
-                print("ERROR: {} does not have sequence information".format(row["qorf_id"]))
+                print("ERROR: {} does not have sequence information".format(row["qorf_id"]), file = sys.stderr)
             else:
                 # dna sequence extraction
                 qseq_dna=extract_sequence(orf2fna, row["qorf_id"], start=row["qostart_dna"], end=row["qoend_dna"])
