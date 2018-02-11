@@ -45,7 +45,7 @@ myrun() {
 
 echo "START: meta-pipeline for ${target} @${TIMESTAMP}"
 
-#myrun download
+myrun download
 myrun represent
 myrun prodigal
 myrun ortho

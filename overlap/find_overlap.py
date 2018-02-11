@@ -159,11 +159,11 @@ def main(strain, hitFilepath, geneFilepath, overlapFilepath):
     ovr_df=add_sbjct_pos(ovr_df, gff_df)
     ovr_df=add_query_pos(ovr_df, hit_df)
     
-    column_lst=["overlap_id", "region_id", "ostart", "oend", "olength", 
-                    "qstrain", "sstrain", "qfamily", "sfamily", "qstrand", "sstrand", "qorf_id", "sorf_id",
-                    "qostart_dna", "qostart_pro", "qoend_dna", "qoend_pro",
-                    "sostart_dna", "sostart_pro", "soend_dna", "soend_pro",
-                    "qstart", "qend", "sstart", "send", "cstart", "cend", "qosp", "qoep"]
+    column_lst=["overlap_id", "region_id", "ostart", "oend", "olength", "chr_name",
+                "qstrain", "sstrain", "qfamily", "sfamily", "qstrand", "sstrand", "qorf_id", "sorf_id",
+                "qostart_dna", "qostart_pro", "qoend_dna", "qoend_pro",
+                "sostart_dna", "sostart_pro", "soend_dna", "soend_pro",
+                "qstart", "qend", "sstart", "send", "cstart", "cend", "qosp", "qoep"]
     ovr_df = ovr_df[column_lst]
     ovr_df = ovr_df.set_index("overlap_id")
     ovr_df.to_csv(overlapFilepath)
