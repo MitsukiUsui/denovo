@@ -14,7 +14,9 @@ def get_strain_lst(target, full = False):
 
 def get_cluster_df(target):
     fp = "{}/{}/cluster.tsv".format(direc, target)
-    df = pd.read_csv(fp, delimiter='\t', dtype="object")
+    df = pd.read_csv(fp, delimiter='\t', dtype=object)
+    df["lineage"] = df["lineage"].astype(int)
+    df["size"] = df["size"].astype(int)
     return df
 
 def get_distance_mat(target, full = False):
