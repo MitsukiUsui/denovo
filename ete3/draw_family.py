@@ -19,10 +19,10 @@ def layout(node):
         faces.add_face_to_node(N, node, 0)
         
         if node.name in f1_lst:
-            C = CircleFace(radius=5, color="RoyalBlue", style="sphere")
+            C = CircleFace(radius=5, color="darkred", style="sphere")
             faces.add_face_to_node(C, node, 1, position="aligned")
         if node.name in f2_lst:
-            C = CircleFace(radius=5, color="darkred", style="sphere")
+            C = CircleFace(radius=5, color="RoyalBlue", style="sphere")
             faces.add_face_to_node(C, node, 2, position="aligned")
 
 
