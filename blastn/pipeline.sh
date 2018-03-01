@@ -3,9 +3,9 @@
 target=${1}
 statusFilename=${2:-.STATUS}
 
-./create_database.sh ${target}
-./query_lookup.py ${target}
-./create_query.py ${target}
+#./create_database.sh ${target}
+#./query_lookup.py ${target}
+#./create_query.py ${target}
 
 cmd=blastn.sh
 argCmd=./arg/${cmd%.*}.py
