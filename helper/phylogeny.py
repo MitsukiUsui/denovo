@@ -21,8 +21,8 @@ class NCBIController:
                     dct[rank] = taxidLineage
                     dct[rank+"_s"] = self.translate(taxidLineage)
             return dct
-        except KeyError:
-            print("ERROR: unknown taxid = {}".format(taxid))
+        except (KeyError, ValueError):
+#            print("ERROR: unknown taxid = {}".format(taxid))
             return dict()
         
     def get_descendant(self, taxid, rank):
