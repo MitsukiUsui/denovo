@@ -4,7 +4,7 @@ from ete3 import Tree
 
 direc="/home/mitsuki/altorf/denovo/data"
 
-def get_strain_lst(target, full = False):
+def get_strain_lst(target, full=False):
     catalogFilepath = "{}/{}/catalog.tsv".format(direc, target)
     catalog_df = pd.read_csv(catalogFilepath, sep="\t")
     if full:
@@ -19,7 +19,7 @@ def get_cluster_df(target):
     df["size"] = df["size"].astype(int)
     return df
 
-def get_distance_mat(target, full = False):
+def get_distance_mat(target, full=False):
     fp = "{}/{}/distance.npy".format(direc, target)
     try:
         distance_mat = np.load(fp)
@@ -40,7 +40,7 @@ def calc_distance_mat(target):
     fp = "{}/{}/cluster.phb".format(direc, target)
     tree = Tree(fp)
 
-    strain_lst = get_strain_lst(target, full = True)
+    strain_lst = get_strain_lst(target, full=True)
     size = len(strain_lst)
     distance_mat = -np.ones((size, size))
     for i in range(size):
