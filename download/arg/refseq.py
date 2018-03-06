@@ -9,5 +9,5 @@ catalogFilepath="../data/{}/catalog.tsv".format(target)
 catalog_df=pd.read_csv(catalogFilepath, sep="\t")
 for _, row in catalog_df.iterrows():
     basename = row["ftp_path"].split("/")[-1]
-    genomeId = row["genome_id"]
-    print("{},{},{}".format(target, basename, genomeId))
+    genomeid = row["genome_id"]
+    print("{},{},{}".format(target, basename, genomeid))

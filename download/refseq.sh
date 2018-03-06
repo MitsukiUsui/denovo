@@ -13,8 +13,6 @@ lineNum=${SGE_TASK_ID:-1}
 line=`awk -v lineNum=$lineNum '{if (NR == lineNum) print $0}' ${argFilepath}`
 target=`echo ${line} | cut -d ',' -f1`
 basename=`echo ${line} | cut -d ',' -f2`
-genomeId=`echo ${line} | cut -d ',' -f3`
+genomeid=`echo ${line} | cut -d ',' -f3`
 
-#OUT=./log/refseq_${JOB_ID}_${SGE_TASK_ID}.out
-#ERR=./log/refseq_${JOB_ID}_${SGE_TASK_ID}.err
-./refseq.py ${target} ${basename} ${genomeId}
+./refseq.py ${target} ${basename} ${genomeid}
