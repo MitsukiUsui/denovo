@@ -10,7 +10,7 @@ from collections import Counter
 sys.path.append("../helper")
 from gff import read_gff, write_gff
 
-def get_fp(target, basename, genomeId):
+def get_fp(target, basename, genomeid):
     """
     organize various filepath information into infp & outfp respectively
     basename: name defined in ftp_path column
@@ -26,7 +26,7 @@ def get_fp(target, basename, genomeId):
 
     outfp={}
     direc="/data/mitsuki/data/denovo/{}/annotation/refseq".format(target)
-    name=genomeId
+    name=genomeid
     outfp["dnaseq"]="/data/mitsuki/data/denovo/{}/dnaseq/{}.dnaseq".format(target, name) # only dnaseq is stored upper directory
     outfp["fna"]="{}/fna/{}.fna".format(direc, name)
     outfp["faa"]="{}/faa/{}.faa".format(direc, name)
@@ -34,13 +34,13 @@ def get_fp(target, basename, genomeId):
         
     return infp, outfp
 
-def edit_dnaseq(inFilepath, outFilepath, genomeId):
+def edit_dnaseq(inFilepath, outFilepath, genomeid):
     """
     add genome_id to head of seqname
     """
     with open(outFilepath, "w") as f:
         for record in SeqIO.parse(inFilepath, "fasta"):
-            record.id = "{}-{}".format(genomeId ,record.id)  #add  genome_id to head
+            record.id = "{}-{}".format(genomeid ,record.id)  #add  genome_id to head
             SeqIO.write(record,  f, "fasta")
 
 def edit_gff(gff_df, outFilepath):
@@ -50,7 +50,7 @@ def edit_gff(gff_df, outFilepath):
     assert "orf_id" in gff_df.columns
     
     gff_df = gff_df[gff_df["feature"]=="CDS"].copy()  #filter only CDS
-    gff_df["seqname"] = ["{}-{}".format(genomeId, seqname) for seqname in gff_df["seqname"]]
+    gff_df["seqname"] = ["{}-{}".format(genomeid, seqname) for seqname in gff_df["seqname"]]
 
     att_lst = []
     for _, row in gff_df.iterrows():
@@ -71,7 +71,7 @@ def parse_description(description):
             dct[e[0]]=e[1]
     return dct
 
-def set_orfId(gff_df):
+def set_orfid(gff_df):
     """
     format of orf_id is ${genome_id}-${cds_id}_${cds_id_count}
     cds_id_count is required only when cds_id is not unique
@@ -82,20 +82,20 @@ def set_orfId(gff_df):
     duplication_lst=[key for key, val in counter.items() if val > 1]
 #    print("DEBUG: found {} duplication for cds_id".format(len(duplication_lst), file=sys.stderr))
     
-    #assign orfId for every row based on "ID" and counter
-    orfId_lst=[] 
+    #assign orfid for every row based on "ID" and counter
+    orfid_lst=[] 
     for _, row in gff_df.iterrows():
         if row["feature"] != "CDS":
-            orfId_lst.append(np.nan)
+            orfid_lst.append(np.nan)
         else:
-            cdsId = row["ID"]
-            if cdsId in duplication_lst:
-                orfId = "{}-{}_{}".format(genomeId, cdsId, counter[cdsId])
-                counter[cdsId]-=1
+            cdsid = row["ID"]
+            if cdsid in duplication_lst:
+                orfid = "{}-{}_{}".format(genomeid, cdsid, counter[cdsid])
+                counter[cdsid]-=1
             else:
-                orfId = "{}-{}".format(genomeId, cdsId)
-            orfId_lst.append(orfId)
-    gff_df["orf_id"] = orfId_lst
+                orfid = "{}-{}".format(genomeid, cdsid)
+            orfid_lst.append(orfid)
+    gff_df["orf_id"] = orfid_lst
     return gff_df
 
 def get_lookup_df(gff_df): 
@@ -125,10 +125,10 @@ def get_lookup_df(gff_df):
     lookup_df=lookup_df[["orf_id", "locus_tag", "protein_id"]]
     return lookup_df
         
-def main(target, basename, genomeId):
+def main(target, basename, genomeid):
     
     #organize input & output filepath
-    infp, outfp = get_fp(target, basename, genomeId)
+    infp, outfp = get_fp(target, basename, genomeid)
     print("IN:")
     for category in ("dnaseq", "fna", "faa", "gff"):
         print("\t{}".format(infp[category]))
@@ -138,11 +138,11 @@ def main(target, basename, genomeId):
     print()
         
     
-    edit_dnaseq(infp["dnaseq"], outfp["dnaseq"], genomeId)
+    edit_dnaseq(infp["dnaseq"], outfp["dnaseq"], genomeid)
     print("DONE: output to {}".format(outfp["dnaseq"]))
     
     gff_df = read_gff(infp["gff"], ["ID", "Parent", "locus_tag", "protein_id", "pseudo"])
-    gff_df = set_orfId(gff_df)
+    gff_df = set_orfid(gff_df)
     lookup_df=get_lookup_df(gff_df)
     
     print("START: load FASTA")
@@ -179,5 +179,5 @@ def main(target, basename, genomeId):
 if __name__=="__main__":
     target = sys.argv[1]
     basename = sys.argv[2]
-    genomeId = sys.argv[3]
-    main(target, basename, genomeId)
+    genomeid = sys.argv[3]
+    main(target, basename, genomeid)
