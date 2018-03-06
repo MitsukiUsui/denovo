@@ -22,8 +22,9 @@ cut -f1 ${catalogFilepath} | tail -n +2 | while read strain
 do
     from=/data/mitsuki/data/denovo/${target}/annotation/refseq/faa/${strain}.faa
     to=${phyloDirec}/input/${target}/${strain}.faa
-    rm ${to}
-    ln -s ${from} ${to}
+    if [ ! -e ${to} ]; then
+        ln -s ${from} ${to}
+    fi   
 done
 
 # run

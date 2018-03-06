@@ -27,7 +27,7 @@ class NCBIController:
         
     def get_descendant(self, taxid, rank):
         ret = []
-        children = self.ncbi.get_descendant_taxa(taxid, rank_limit="genus")
+        children = self.ncbi.get_descendant_taxa(taxid, rank_limit=rank)
         for k, v in self.ncbi.get_rank(children).items():
             if v == rank:
                 ret.append(k)
