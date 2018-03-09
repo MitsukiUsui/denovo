@@ -26,12 +26,12 @@ def get_overlap_df(gff_df, hit_df):
             if row["sseqid"]==chrName:
                 stt = min(row["sstart"], row["send"]) - 1
                 end = max(row["sstart"], row["send"])
-                pos_lst.append( (stt, True, 1, row["region_id"]) )
-                pos_lst.append( (end, False, 1, row["region_id"]) )
+                pos_lst.append( (stt, True, 1, row["hit_id"]) )
+                pos_lst.append( (end, False, 1, row["hit_id"]) )
         pos_lst=sorted(pos_lst, key=lambda x: (x[0], x[1], x[2])) # sort by first element. need to be deterministic...?
 
         # 2. create overlap_dctdct
-        #  key: (orf_id, region_id), value: (ofirst, olast)
+        #  key: (orf_id, hit_id), value: (ofirst, olast)
         
         overlap_dctdct={}
         cds_lst, region_lst=[], []  # remember in process cds or region
@@ -71,7 +71,7 @@ def get_overlap_df(gff_df, hit_df):
         #update dct_lst according to overlap_dctdct
         for k,v in overlap_dctdct.items():
             dct={}
-            dct["sorf_id"], dct["region_id"] = k[0], k[1]
+            dct["sorf_id"], dct["hit_id"] = k[0], k[1]
             dct["ostart"], dct["oend"] = v["ostart"], v["oend"]
             dct["olength"]=v["oend"] - v["ostart"]
             dct["chr_name"]=chrName
@@ -80,7 +80,7 @@ def get_overlap_df(gff_df, hit_df):
         
     overlap_df=pd.DataFrame(dct_lst)
     overlap_df["overlap_id"] = overlap_df.index
-    overlap_df=overlap_df[["overlap_id", "sorf_id", "region_id", "chr_name", "ostart", "oend", "olength"]]
+    overlap_df=overlap_df[["overlap_id", "sorf_id", "hit_id", "chr_name", "ostart", "oend", "olength"]]
     return overlap_df
 
 def add_sbjct_pos(overlap_df, gff_df):
@@ -115,8 +115,8 @@ def add_query_pos(overlap_df, hit_df):
     # format hit_df & left join to overlap_df
     hit_df["qstrand"] = hit_df["hit_strand"]
     hit_df["qorf_id"] = hit_df["qseqid"]
-    hit_df=hit_df[["region_id", "qstart", "qend", "sstart", "send", "qstrand", "qorf_id", "qfamily", "qstrain", "sstrain"]]
-    ret_df=pd.merge(overlap_df, hit_df, on="region_id")
+    hit_df=hit_df[["hit_id", "qstart", "qend", "sstart", "send", "qstrand", "qorf_id", "qfamily", "qstrain", "sstrain"]]
+    ret_df=pd.merge(overlap_df, hit_df, on="hit_id")
     assert ret_df.shape[0]==overlap_df.shape[0]
     
     # calculate qostart & qoend
@@ -159,7 +159,7 @@ def main(strain, hitFilepath, geneFilepath, overlapFilepath):
     ovr_df=add_sbjct_pos(ovr_df, gff_df)
     ovr_df=add_query_pos(ovr_df, hit_df)
     
-    column_lst=["overlap_id", "region_id", "ostart", "oend", "olength", "chr_name",
+    column_lst=["overlap_id", "hit_id", "ostart", "oend", "olength", "chr_name",
                 "qstrain", "sstrain", "qfamily", "sfamily", "qstrand", "sstrand", "qorf_id", "sorf_id",
                 "qostart_dna", "qostart_pro", "qoend_dna", "qoend_pro",
                 "sostart_dna", "sostart_pro", "soend_dna", "soend_pro",

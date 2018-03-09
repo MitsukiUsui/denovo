@@ -32,7 +32,7 @@ def main(target, subStrain, lookupFilepath):
     assert out_df.shape[0]==len(dct_lst)
     tmp_df=pd.DataFrame(dct_lst, index=out_df.index)
     out_df=pd.concat([out_df, tmp_df], axis=1)
-    out_df.index.name="region_id"
+    out_df.index.name="hit_id"
 
     outFilepath=hitFilepath.replace(".tab", ".csv")
     out_df.to_csv(outFilepath)
