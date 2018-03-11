@@ -15,7 +15,7 @@ def main(target, trgFilepath, outFilepath):
     # create query for every member of trg (highly redundant though)
     dct_lst=[]
     for _, row in cluster_df.iterrows():
-        if row["genus"] > 0 and row["lineage"] > 1:
+        if row["genus"] > 0 and row["lineage"] > 0:
             orfids_lst = list(row[strain_lst].dropna().values)
             for orfids in orfids_lst:
                 for orfid in orfids.split(','):

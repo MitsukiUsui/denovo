@@ -20,4 +20,4 @@ mkdir -p ./out/${target}/${strain}
 ./define_extract.py ${target} ${strain}
 ./extract_seq.py ${target} ${strain}
 ./assign_phase.py ${target} ${strain}
-./profile.py ${target} ${strain}
+./blastn_profiler.py ${target} ${strain}

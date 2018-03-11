@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+"""
+create header only csv for each family.
+"""
+
 import sys
 import os
 import pandas as pd

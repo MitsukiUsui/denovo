@@ -3,7 +3,7 @@
 target=${1}
 statusFilename=${2:-.STATUS}
 
-#./create_database.sh ${target}
+./create_database.sh ${target}
 #./query_lookup.py ${target}
 ./create_query.py ${target}
 

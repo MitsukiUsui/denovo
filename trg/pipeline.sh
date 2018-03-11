@@ -5,22 +5,20 @@ set -u
 target=${1}
 statusFilename=${2:-.STATUS}
 
-./mmseqs_pre.py ${target}
-./mmseqs.sh ${target}
-./mmseqs_post.py ${target}
+cmd=mmseqs.sh
+numJobs=1
+jobid=`qsub -terse ${cmd} ${target}`
+echo "submitted ${numJobs} jobs with job_id=${jobid}"
 
-./split.py ${target}
-./split.sh ${target}
+cmd=trg.sh
+numJobs=1
+prvJobid=${jobid}
+jobid=`qsub -terse -hold_jid ${prvJobid} ${cmd} ${target}`
+echo "submitted checker with job_id=${jobid}, dependency=${prvJobid}"
 
-./lca.py ${target}
-./trg.py ${target}
-
-#--------------------------------------------------------------------------------
-# check if pipeline above worked correctly
-#--------------------------------------------------------------------------------
-#cmd=checker.sh
-#numJobs=1
-#prevJobId=${jobId}
-#jobId=`qsub -terse -hold_jid ${prevJobId} ${cmd} ${target} ${statusFilename}`
-#echo "submitted checker with job_id=${jobId}, dependency=${prevJobId}"
+cmd=checker.sh
+numJobs=1
+prvJobid=${jobid}
+jobid=`qsub -terse -hold_jid ${prvJobid} ${cmd} ${target} ${statusFilename}`
+echo "submitted checker with job_id=${jobid}, dependency=${prvJobid}"
 

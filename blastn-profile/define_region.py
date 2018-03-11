@@ -70,7 +70,7 @@ def main(hitFilepath, gffFilepath, dnaFilepath, outFilepath):
                 pseudo_lst.append(myinterval.Interval(row["start"]-1, row["end"], row["orf_id"]))
             else:
                 genic_lst.append(myinterval.Interval(row["start"]-1, row["end"], row["orf_id"]) )
-        inter_lst =  myinterval.complement(genic_lst+pseudo_lst, 0,  seqlength, setid=True)
+        inter_lst =  myinterval.complement(genic_lst+pseudo_lst, 0,  seqlength)
         
         # define list of Interval for hit
         hit_lst = []

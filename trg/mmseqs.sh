@@ -12,6 +12,9 @@
 set -u
 
 target=${1}
+
+./mmseqs_pre.py ${target}
+
 mmseqsDirec=/data/mitsuki/out/altorf/denovo/trg/${target}/mmseqs
 seqFilepath=${mmseqsDirec}/query.faa
 queryDB=${mmseqsDirec}/queryDB
@@ -21,8 +24,8 @@ tmpDirec=${mmseqsDirec}/tmp
 targetDB=/data/mitsuki/data/refseq/nr/targetDB
 
 mkdir -p ${tmpDirec}
-
 mmseqs createdb ${seqFilepath} ${queryDB}
 mmseqs search ${queryDB} ${targetDB} ${resultDB} ${tmpDirec} --threads 20
 mmseqs convertalis ${queryDB} ${targetDB} ${resultDB} ${resultTsv} --threads 20
 
+./mmseqs_post.py ${target}

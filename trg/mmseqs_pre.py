@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+"""
+select queryies for mmseqs search against nr
+"""
+
 import sys
 import os
 from Bio import SeqIO

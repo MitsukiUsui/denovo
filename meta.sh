@@ -1,7 +1,7 @@
 #!/bin/bash
 set -u
 
-MYVERSION="ver1.2"
+MYVERSION="ver2.0"
 TIMESTAMP=`date +%s`
 DATE=`date -d @${TIMESTAMP}`
 
@@ -46,13 +46,10 @@ myrun() {
 echo "START: meta-pipeline for ${target} @${TIMESTAMP}"
 
 myrun download
-myrun represent
-myrun prodigal
+myrun phylogeny
 myrun ortho
+myrun trg 
 myrun blastn
-myrun synteny
-myrun overlap
-myrun analyze-helper
 
 echo "DONE: all steps successfully"
 echo "${target},${MYVERSION},${TIMESTAMP},${DATE}" >> record.txt
