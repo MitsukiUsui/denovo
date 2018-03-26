@@ -5,7 +5,7 @@ import sys
 
 def main(target, subStrain, lookupFilepath):
     lookup_df=pd.read_csv(lookupFilepath)
-    
+
     hitFilepath="./result/{}/{}.tab".format(target, subStrain)
     columns_lst=["qseqid", "sseqid", "pident", "length", "mismatch", "gapopen",
                  "qstart", "qend", "sstart","send", "evalue", "bitscore"]

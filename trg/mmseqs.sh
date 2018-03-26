@@ -4,6 +4,7 @@
 #$ -q standard.q
 #$ -cwd
 #$ -v PATH
+#$ -v BLASTADMIN_DATA
 #$ -o ./log/mmseqs_$JOB_ID.out
 #$ -e ./log/mmseqs_$JOB_ID.err
 #$ -l mem_free=100G
@@ -13,19 +14,11 @@ set -u
 
 target=${1}
 
-./mmseqs_pre.py ${target}
+direc=/data/mitsuki/out/altorf/denovo/trg/${target}
+queryFilepath=${direc}/mmseqs/query.faa
+resultFilepath=${direc}/mmseqs/result.m8
+outFilepath=${direc}/result.csv
 
-mmseqsDirec=/data/mitsuki/out/altorf/denovo/trg/${target}/mmseqs
-seqFilepath=${mmseqsDirec}/query.faa
-queryDB=${mmseqsDirec}/queryDB
-resultDB=${mmseqsDirec}/resultDB
-resultTsv=${mmseqsDirec}/result.m8
-tmpDirec=${mmseqsDirec}/tmp
-targetDB=/data/mitsuki/data/refseq/nr/targetDB
-
-mkdir -p ${tmpDirec}
-mmseqs createdb ${seqFilepath} ${queryDB}
-mmseqs search ${queryDB} ${targetDB} ${resultDB} ${tmpDirec} --threads 20
-mmseqs convertalis ${queryDB} ${targetDB} ${resultDB} ${resultTsv} --threads 20
-
-./mmseqs_post.py ${target}
+./mmseqs_query.py ${target} ${queryFilepath}
+blastadmin.py search mmseqs nr ${queryFilepath} ${resultFilepath}
+./mmseqs_post.py ${target} ${queryFilepath} ${resultFilepath} ${outFilepath}

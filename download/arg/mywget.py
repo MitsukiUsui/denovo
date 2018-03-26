@@ -3,7 +3,7 @@
 import sys
 import pandas as pd
 
-def main(catalogFilepath):    
+def main(catalogFilepath):
     directory_lst = ["/data/mitsuki/data/refseq/dnaseq",
                         "/data/mitsuki/data/refseq/gff",
                         "/data/mitsuki/data/refseq/cds",
@@ -12,7 +12,7 @@ def main(catalogFilepath):
                   "_genomic.gff.gz",
                   "_cds_from_genomic.fna.gz",
                   "_protein.faa.gz"]
-    
+
     catalog_df=pd.read_csv(catalogFilepath, sep="\t")
     for _, row in catalog_df.iterrows():
         for directory, suffix in zip(directory_lst, suffix_lst):

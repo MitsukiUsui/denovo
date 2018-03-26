@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 import sys
+import os
 import pandas as pd
 from ete3 import PhyloTree, Tree, TreeStyle, NodeStyle, faces, AttrFace, CircleFace
 
-sys.path.append("/home/mitsuki/altorf/denovo/helper")
+sys.path.append("../helper")
 from myio import *
 
 def get_strain(cluster_df, strain_lst, family):
@@ -17,7 +18,7 @@ def layout(node):
     if node.is_leaf():
         N = AttrFace("name", fsize=14, fgcolor="black") #  can be "sci_name"
         faces.add_face_to_node(N, node, 0)
-        
+
         if node.name in f1_lst:
             C = CircleFace(radius=5, color="darkred", style="sphere")
             faces.add_face_to_node(C, node, 1, position="aligned")
@@ -28,17 +29,22 @@ def layout(node):
 
 target=sys.argv[1]
 family1=sys.argv[2]
-family2=sys.argv[3]
-outFilepath="{}_{}_{}.png".format(target, family1, family2)
+outFilepath="./png/{}/{}.png".format(target, family1)
+outDirec=os.path.dirname(os.path.abspath(outFilepath))
+if not os.path.exists(outDirec):
+    os.makedirs(outDirec)
+
+#family2=sys.argv[3]
 #outFilepath=sys.argv[4]
 
 dataDirec="/home/mitsuki/altorf/denovo/data/{}".format(target)
-nwkFilepath="{}/cluster.phb".format(dataDirec)
+nwkFilepath="{}/cluster.format.phb".format(dataDirec)
 strain_lst = get_strain_lst(target)
 cluster_df = get_cluster_df(target)
 
 f1_lst=get_strain(cluster_df, strain_lst, family1)
-f2_lst=get_strain(cluster_df, strain_lst, family2)
+f2_lst=[]
+#f2_lst=get_strain(cluster_df, strain_lst, family2)
 
 t = PhyloTree(nwkFilepath)
 ts = TreeStyle()

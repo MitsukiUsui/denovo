@@ -9,17 +9,15 @@
 #$ -e ./log/blastn_$JOB_ID_$TASK_ID.err
 #$ -l mem_free=5G
 
+set -ue
+
 argFilepath=${1}
 if [ -z ${SGE_TASK_ID+x} ] ; then lineNum=1; else lineNum=${SGE_TASK_ID}; fi;
 line=`awk -v lineNum=$lineNum '{if (NR == lineNum) print $0}' ${argFilepath}`
-target=`echo ${line} | cut -d ',' -f1`
-strain=`echo ${line} | cut -d ',' -f2`
+id=`echo ${line} | cut -d ',' -f1`
+filepath=`echo ${line} | cut -d ',' -f2`
+query=`echo ${line} | cut -d ',' -f3`
+result=`echo ${line} | cut -d ',' -f4`
 
-
-dir=.
-queryFilepath=${dir}/query/${target}/${strain}.fna
-outFilepath=${dir}/result/${target}/${strain}.tab
-
-mkdir -p `dirname ${outFilepath}`
-blastadmin.py search blastn ${queryFilepath} ${strain} ${outFilepath}
-./blastn_post.py ${target} ${strain}
+yes no|blastadmin.py ln ${id} ${filepath}
+blastadmin.py search blastn ${id} ${query} ${result}

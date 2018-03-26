@@ -8,8 +8,9 @@ import sys
 import pandas as pd
 from Bio import SeqIO
 
-sys.path.append("/home/mitsuki/altorf/denovo/helper")
+sys.path.append("../helper")
 from myio import get_cluster_df, get_strain_lst
+from TaxDbController import TaxDbController
 
 def read_m8(fp):
     columns_lst=["qseqid", "sseqid", "pident", "length", "mismatch", "gapopen",
@@ -18,9 +19,8 @@ def read_m8(fp):
     return hit_df
 
 def get_taxid_lst(accessionVersion_lst):
-    from TaxDbController import TaxDbController
     tdc = TaxDbController("/data/mitsuki/data/refseq/accession2taxid/prot.accession2taxid.sq3")
-    
+
     #  create accession2taxid lookup dictionaly first
     accessionVersion_set=set(accessionVersion_lst)
     accession2taxid=dict()
@@ -33,7 +33,7 @@ def get_taxid_lst(accessionVersion_lst):
             print(".", end="", flush=True)
         accession2taxid[accessionVersion]=tdc.accession2taxid(accessionVersion)
     print()
-    
+
     taxid_lst=[accession2taxid[accessionVersion] for accessionVersion in accessionVersion_lst]
     return taxid_lst
 
@@ -48,7 +48,7 @@ def main(target, queryFilepath, resultFilepath, outFilepath):
     result_df = read_m8(resultFilepath)
     result_df = result_df.rename(columns={'qseqid': 'orf_id', 'sseqid': "accession_version"})
     print("DONE: load {} hit result {}".format(result_df.shape[0], resultFilepath), flush=True)
-    
+
     # create family_df ("family", "orf_id")
     strain_lst = get_strain_lst(target)
     cluster_df = get_cluster_df(target)
@@ -60,7 +60,7 @@ def main(target, queryFilepath, resultFilepath, outFilepath):
                 dct = {"family": family, "orf_id": orfid}
                 dct_lst.append(dct)
     family_df = pd.DataFrame(dct_lst)
-    
+
     join_df = pd.merge(result_df, family_df, on="orf_id", how="left")
     print("DONE: merge family", flush=True)
     join_df["tax_id"] = get_taxid_lst(join_df["accession_version"])
@@ -68,17 +68,16 @@ def main(target, queryFilepath, resultFilepath, outFilepath):
     join_df["qlength"] = get_qlength_lst(join_df["orf_id"], queryFilepath)
     print("DONE: merge qlength", flush=True)
 
-    col_lst = ["family", "orf_id", "accession_version", "tax_id", 
+    col_lst = ["family", "orf_id", "accession_version", "tax_id",
                 "pident", "length", "mismatch", "gapopen", "qstart", "qend", "qlength", "sstart", "send", "evalue", "bitscore"]
     join_df = join_df[col_lst]
     join_df.to_csv(outFilepath, index=False)
     print("DONE: output {}".format(outFilepath), flush=True)
-    
+
 if __name__ == "__main__":
     target = sys.argv[1]
-    direc = "/data/mitsuki/out/altorf/denovo/trg/{}".format(target)
-    queryFilepath = "{}/mmseqs/query.faa".format(direc)
-    resultFilepath = "{}/mmseqs/result.m8".format(direc)
-    outFilepath = "{}/result.csv".format(direc)
+    queryFilepath = sys.argv[2]
+    resultFilepath = sys.argv[3]
+    outFilepath = sys.argv[4]
     main(target, queryFilepath, resultFilepath, outFilepath)
-    
+

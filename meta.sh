@@ -1,7 +1,7 @@
 #!/bin/bash
 set -u
 
-MYVERSION="ver2.0"
+MYVERSION="ver2.1"
 TIMESTAMP=`date +%s`
 DATE=`date -d @${TIMESTAMP}`
 
@@ -22,9 +22,9 @@ waitfor() {
 
 myrun() {
     # require pipeline.sh & corresponting checker.sh mechanism
-    
+
     step=${1}
-   
+
     echo ""
     echo "START: ${step}"
     cd ./${step}
@@ -45,11 +45,17 @@ myrun() {
 
 echo "START: meta-pipeline for ${target} @${TIMESTAMP}"
 
-myrun download
-myrun phylogeny
-myrun ortho
-myrun trg 
-myrun blastn
+#myrun download
+#myrun phylogeny
+#echo "DONE: preprocess"
 
-echo "DONE: all steps successfully"
-echo "${target},${MYVERSION},${TIMESTAMP},${DATE}" >> record.txt
+myrun ortho
+myrun prodigal
+myrun analyze-helper
+myrun trg
+echo "DONE: trg successfully"
+
+#myrun blastn
+#myrun blastn-profile
+#echo "DONE: all steps successfully"
+#echo "${target},${MYVERSION},${TIMESTAMP},${DATE}" >> record.txt

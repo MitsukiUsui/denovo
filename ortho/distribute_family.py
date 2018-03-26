@@ -19,7 +19,7 @@ def output_family2rec(family2rec, outDirec, ext):
 def main(target, strain_lst):
     annotType="refseq"
     direc="/data/mitsuki/data/denovo/{}/annotation/{}".format(target, annotType)
-    
+
     print("START: parse {} * 2 FASTA files".format(len(strain_lst)))
     family2fna=defaultdict(list)
     family2faa=defaultdict(list)

@@ -11,9 +11,9 @@
 set -u
 
 target=${1}
-#./split.py ${target}
-#./split.sh ${target}
-#./lca.py ${target}
+./split.py ${target}
+./split.sh ${target}
+./lca.py ${target}
 #./trg.py ${target}
-./query_lookup.py ${target}
+#./query_lookup.py ${target}
 

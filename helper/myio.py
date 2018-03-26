@@ -1,6 +1,9 @@
+import random
 import pandas as pd
 import numpy as np
 from ete3 import Tree
+from Bio import SeqIO
+
 
 direc="/home/mitsuki/altorf/denovo/data"
 
@@ -34,7 +37,6 @@ def get_distance_mat(target, full=False):
         catalog_df = pd.read_csv(catalogFilepath, sep="\t")
         msk = np.array(catalog_df["represent"] == 1)
         return distance_mat[msk, :][:, msk]
-        
 
 def calc_distance_mat(target):
     fp = "{}/{}/cluster.phb".format(direc, target)
@@ -48,6 +50,25 @@ def calc_distance_mat(target):
             distance_mat[i][j] = tree.get_distance(strain_lst[i], strain_lst[j])
             distance_mat[j][i] = distance_mat[i][j]
     return distance_mat
+
+def get_orf2family(target):
+    orf2family = {}
+    cluster_df = get_cluster_df(target)
+    strain_lst = get_strain_lst(target)
+    for strain in strain_lst:
+        for family, orfids in zip(cluster_df["family"], cluster_df[strain]):
+            if isinstance(orfids, str):
+                for orfid in orfids.split(','):
+                    orf2family[orfid] = family
+    return orf2family
+
+def sample_record(target, family, ext, n=1):
+    assert ext=="fna" or ext=="faa"
+    fp = "/data/mitsuki/data/denovo/{0}/annotation/refseq/family/{2}/{1}.{2}".format(target, family, ext)
+    rec_lst = []
+    for rec in SeqIO.parse(fp, "fasta"):
+        rec_lst.append(rec)
+    return random.sample(rec_lst, min(len(rec_lst), n))
 
 if __name__=="__main__":
     print(get_strain_lst("synechococcaceae"))

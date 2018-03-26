@@ -19,7 +19,7 @@ def main(target, thres, catalogFilepath):
                 if distance_mat[i][j] < thres:
                     msk[j] = False
     print("DONE: select representative {}/{} strains".format(msk.sum(), len(msk)))
-    
+
     catalog_df["represent"] = msk.astype(int)
     catalog_df.to_csv(catalogFilepath, index=False, sep="\t")
     print("DONE: update {}".format(catalogFilepath))

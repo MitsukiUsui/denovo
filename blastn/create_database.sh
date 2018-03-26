@@ -11,8 +11,7 @@ catalogFilepath=../data/${target}/catalog.tsv
 cut -f1 ${catalogFilepath} | tail -n +2 | while read strain
 do
 	inFilepath=/data/mitsuki/data/denovo/${target}/dnaseq/${strain}.dnaseq
-	dbName=${outDirec}/${strain}
-	makeblastdb -in ${inFilepath} -dbtype nucl -out ${dbName} -logfile /dev/null
-	echo -e "\tDONE: output ${dbName}"
+    blastadmin.py ln ${strain} ${inFilepath}
+    blastadmin.py createdb blastn ${strain}
 done
 

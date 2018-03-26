@@ -29,7 +29,7 @@ def main(target, outFilepath):
                     x = np.ma.array(distance_mat[sidx], mask=msk)
                     qidx=x.argmin() #query index
                     assert distance_mat[sidx,qidx]>=0
-                    orfId=row[strain_lst[qidx]].split(',')[0] #use only first gene as a query 
+                    orfId=row[strain_lst[qidx]].split(',')[0] #use only first gene as a query
                     dct[strain_lst[sidx]]=orfId
             dct_lst.append(dct)
     out_df=pd.DataFrame(dct_lst)

@@ -24,12 +24,13 @@ do
     to=${phyloDirec}/input/${target}/${strain}.faa
     if [ ! -e ${to} ]; then
         ln -s ${from} ${to}
-    fi   
+    fi
 done
 
 # run
 cd ${phyloDirec}
 ./phylophlan.py -u ${target} --nproc 10 1>/dev/null 2>/dev/null
+#./phylophlan.py -u ${target} --nproc 10
 
 # create link for newick
 nwkFilepath=${phyloDirec}/output/${target}/${target}.tree.nwk

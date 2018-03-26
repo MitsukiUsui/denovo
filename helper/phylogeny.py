@@ -3,14 +3,17 @@ from ete3 import NCBITaxa
 class NCBIController:
     def __init__(self):
         self.ncbi = NCBITaxa()
-        
+
+    def encode(self, name):
+        return self.ncbi.get_name_translator([name])[name]
+
     def translate(self, taxid):
         """
         :ret scientific name
         """
         return self.ncbi.get_taxid_translator([taxid])[taxid]
-    
-    def get_lineage(self, taxid, rank_lst = None):        
+
+    def get_lineage(self, taxid, rank_lst = None):
         if rank_lst is None:
             rank_lst = ["superkingdom", "phylum", "class", "order", "family", "genus", "species"]
 
@@ -24,7 +27,7 @@ class NCBIController:
         except (KeyError, ValueError):
 #            print("ERROR: unknown taxid = {}".format(taxid))
             return dict()
-        
+
     def get_descendant(self, taxid, rank):
         ret = []
         children = self.ncbi.get_descendant_taxa(taxid, rank_limit=rank)
@@ -32,7 +35,10 @@ class NCBIController:
             if v == rank:
                 ret.append(k)
         return ret
-    
+
+    def is_descendant(self, child, parent):
+        return parent in self.ncbi.get_lineage(child)
+
 if __name__=="__main__":
     nc = NCBIController()
     print(nc.get_descendant(85025, rank="genus"))
