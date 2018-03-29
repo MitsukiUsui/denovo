@@ -4,6 +4,8 @@ set -ue
 
 target=${1}
 
+./create_query.py ${target}
+
 mkdir -p ./result/${target}
 
 cmd=blastn.sh

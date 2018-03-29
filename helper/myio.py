@@ -4,8 +4,18 @@ import numpy as np
 from ete3 import Tree
 from Bio import SeqIO
 
-
 direc="/home/mitsuki/altorf/denovo/data"
+
+class DistanceManager:
+    def __init__(self, target):
+        distance_mat = get_distance_mat(target)
+        for i in range(distance_mat.shape[0]):
+            distance_mat[i][i] = 0
+        self.distance_mat = distance_mat
+        self.strain_lst = get_strain_lst(target)
+
+    def distance(self, g1, g2):
+        return self.distance_mat[self.strain_lst.index(g1)][self.strain_lst.index(g2)]
 
 def get_strain_lst(target, full=False):
     catalogFilepath = "{}/{}/catalog.tsv".format(direc, target)
@@ -69,6 +79,12 @@ def sample_record(target, family, ext, n=1):
     for rec in SeqIO.parse(fp, "fasta"):
         rec_lst.append(rec)
     return random.sample(rec_lst, min(len(rec_lst), n))
+
+def get_hit_df(fp):
+    columns_lst=["qseqid", "sseqid", "pident", "length", "mismatch", "gapopen",
+                 "qstart", "qend", "sstart","send", "evalue", "bitscore"]
+    hit_df=pd.read_csv(fp, delimiter='\t', header=None, names=columns_lst)
+    return hit_df
 
 if __name__=="__main__":
     print(get_strain_lst("synechococcaceae"))

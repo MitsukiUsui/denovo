@@ -9,7 +9,7 @@ sys.path.append("../helper")
 from myio import *
 
 def output_query(target, lookupFilepath, outDirec, ext):
-    full = True
+    full = False
     lookup_df = pd.read_csv(lookupFilepath)
     strain_lst = get_strain_lst(target, full)
 

@@ -18,6 +18,7 @@ def main(catalogFilepath):
         for directory, suffix in zip(directory_lst, suffix_lst):
             filename=row["ftp_path"].split("/")[-1] + suffix
             ftpFilepath="{}/{}".format(row["ftp_path"], filename)
+            ftpFilepath=ftpFilepath.replace("ftp.ncbi.nlm.nih.gov", "165.112.9.229")
             outFilepath="{}/{}".format(directory, filename.replace(".gz", ""))
             print("{},{}".format(ftpFilepath, outFilepath))
 

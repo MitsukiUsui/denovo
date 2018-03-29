@@ -21,7 +21,7 @@ def main(target, catalogFilepath, nwkFilepath, outFilepath):
 
     #pruning
     represent_lst = list(catalog_df[catalog_df["represent"] == 1]["genome_id"])
-    tree.prune(outgroup_lst + represent_lst)
+    tree.prune(outgroup_lst + represent_lst, preserve_branch_length=True)
 
     #output
     tree.write(outfile=outFilepath)

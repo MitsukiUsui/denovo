@@ -2,13 +2,14 @@
 
 target=${1}
 statusFilename=${2:-.STATUS}
+TIMESTAMP=`date +%s`
 
 #--------------------------------------------------------------------------------
 # download from RefSeq-ftp and store
 #--------------------------------------------------------------------------------
 cmd=mywget.sh
 argCmd=./arg/${cmd%.*}.py
-argFilepath=${argCmd%.*}.lst
+argFilepath=${argCmd%.*}.${TIMESTAMP}
 eval ${argCmd} ${target} > ${argFilepath}
 numJobs=`grep -c '' ${argFilepath}`
 jobId_r=`qsub -terse -t 1-${numJobs} -tc 10 ${cmd} ${argFilepath}`
@@ -26,7 +27,7 @@ mkdir -p ${baseDirec}/annotation/refseq/faa
 
 cmd=refseq.sh
 argCmd=./arg/${cmd%.*}.py
-argFilepath=${argCmd%.*}.lst
+argFilepath=${argCmd%.*}.${TIMESTAMP}
 eval ${argCmd} ${target} > ${argFilepath}
 numJobs=`grep -c '' ${argFilepath}`
 prevJobId=${jobId}

@@ -7,7 +7,7 @@ import pandas as pd
 if __name__=="__main__":
     config_df = pd.read_csv("extract.config")
     outFilepath = "extract.out"
-    
+
     print("START: output to {}".format(outFilepath))
     with open(outFilepath, "w") as f:
         for _, row in config_df.iterrows():
