@@ -23,7 +23,7 @@ def main(target, strain, outFilepat):
         }
         dct_lst.append(dct)
 
-    # extract hit information into myinterval.Interval
+    # extract hit information into myinterval.Interval to prepare for coverage
     hitFilepath = "./result/{}/{}.tsv".format(target, strain)
     hit_df = get_hit_df(hitFilepath)
     query2interval = defaultdict(list)
@@ -56,11 +56,12 @@ def main(target, strain, outFilepat):
     cluster_df = (get_cluster_df(target))[["family", strain]]
     cluster_df["possess"] = cluster_df[strain].notnull().astype(int)
     out_df = pd.merge(out_df, cluster_df[["family", "possess"]], on="family", how="left")
+    out_df["traceable"] = ((out_df["qlength"] >= 150) & (out_df["possess"] == 0) &(out_df["coverage"] >= 0.5)).astype(int)
     out_df.to_csv(outFilepath, index=False)
     print("DONE: output {}".format(outFilepath))
 
 if __name__=="__main__":
-    target = "mycobacterium"
+    target = sys.argv[1]
     outDirec = "./out/{}".format(target)
     os.makedirs(outDirec, exist_ok=True)
 
